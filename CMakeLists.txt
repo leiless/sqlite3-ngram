@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(fts5_ngram_tokenizer)
+project(ngram-porter)
 
 set(CMAKE_C_STANDARD 99)
 
@@ -30,6 +30,6 @@ execute_process(
 add_compile_definitions(BUILD_USER="${BUILD_USER}")
 
 add_library(${PROJECT_NAME} SHARED
-        src/fts5_ngram_tokenizer.c
+        src/ngram_porter.c
         src/utils.c
-)
+        )
