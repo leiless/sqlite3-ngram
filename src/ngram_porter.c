@@ -203,7 +203,8 @@ int sqlite3_extension_init(
 
     LOG("HEAD commit: %s", BUILD_HEAD_COMMIT);
     LOG("Built by %s at %s", BUILD_USER, BUILD_TIMESTAMP);
-    LOG("SQLite3 version: %s", sqlite3_libversion());
+    LOG("SQLite3 compile-time version: %s", SQLITE_VERSION);
+    LOG("SQLite3 dynamic-load version: %s", sqlite3_libversion());
 
     fts5_api *pFts5Api = fts5_api_from_db(db);
     if (pFts5Api == NULL) {
