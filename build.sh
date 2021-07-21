@@ -5,6 +5,11 @@ set -euf -o pipefail
 
 cd "$(dirname "$0")"
 
+if [ ! -L src/sqlite ]; then
+    echo "ERR: Please run download-sqlite.sh first!"
+    exit 1
+fi
+
 mkdir -p build
 pushd build > /dev/null
     cmake ..
