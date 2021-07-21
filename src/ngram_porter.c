@@ -8,9 +8,11 @@
 #include <string.h>
 
 #include "sqlite/sqlite3ext.h"      /* Do not use <sqlite3.h>! */
+
 SQLITE_EXTENSION_INIT1
 
 #define ASSERTF_DEF_ONCE
+
 #include "assertf.h"
 #include "utils.h"
 #include "types.h"
@@ -27,8 +29,7 @@ SQLITE_EXTENSION_INIT1
  *  https://pspdfkit.com/blog/2018/leveraging-sqlite-full-text-search-on-ios/
  *  https://archive.is/wip/B6gDa
  */
-static fts5_api *fts5_api_from_db(sqlite3 *db)
-{
+static fts5_api *fts5_api_from_db(sqlite3 *db) {
     assert_nonnull(db);
 
     fts5_api *pFts5Api = NULL;
@@ -69,8 +70,7 @@ typedef struct {
  *  If an error occurs, some value other than SQLITE_OK should be returned.
  *  In this case, fts5 assumes that the final value of *ppOut is undefined.
  */
-static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer **ppOut)
-{
+static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer **ppOut) {
     LOG_DBG("Creating FTS5 ngram tokenizer...");
     LOG_DBG("pCtx: %p azArg: %p nArg: %d ppOut: %p", pCtx, azArg, nArg, ppOut);
 
@@ -116,7 +116,7 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
 
     *ppOut = (Fts5Tokenizer *) tok;
     return SQLITE_OK;
-out_fail:
+    out_fail:
     sqlite3_free(tok);
     return SQLITE_ERROR;
 }
@@ -126,8 +126,7 @@ out_fail:
  * This function is invoked to delete a tokenizer handle previously allocated using xCreate().
  * Fts5 guarantees that this function will be invoked exactly once for each successful call to xCreate().
  */
-static void ngram_delete(Fts5Tokenizer *pTok)
-{
+static void ngram_delete(Fts5Tokenizer *pTok) {
     LOG_DBG("Freeing FTS5 ngram tokenizer...");
     LOG_DBG("pTok: %p", pTok);
 
@@ -137,12 +136,12 @@ static void ngram_delete(Fts5Tokenizer *pTok)
 }
 
 typedef int (*xTokenCallback)(
-    void *pCtx,         /* Copy of 2nd argument to xTokenize() */
-    int tflags,         /* Mask of FTS5_TOKEN_* flags */
-    const char *pToken, /* Pointer to buffer containing token */
-    int nToken,         /* Size of token in bytes */
-    int iStart,         /* Byte offset of token within input text */
-    int iEnd            /* Byte offset of end of token within input text */
+        void *pCtx,         /* Copy of 2nd argument to xTokenize() */
+        int tflags,         /* Mask of FTS5_TOKEN_* flags */
+        const char *pToken, /* Pointer to buffer containing token */
+        int nToken,         /* Size of token in bytes */
+        int iStart,         /* Byte offset of token within input text */
+        int iEnd            /* Byte offset of end of token within input text */
 );
 
 /**
@@ -159,8 +158,7 @@ static int ngram_tokenize(
         int flags,          /* Mask of FTS5_TOKENIZE_* flags */
         const char *pText,
         int nText,
-        xTokenCallback xToken)
-{
+        xTokenCallback xToken) {
     assert_nonnull(pTok);
     assert_nonnull(pCtx);
     assert_nonnull(pText);
@@ -190,11 +188,11 @@ static int ngram_tokenize(
 #ifdef _WIN32
 __declspec(dllexport)
 #endif
+
 int sqlite3_extension_init(
         sqlite3 *db,
         char **pzErrMsg,
-        const sqlite3_api_routines *pApi)
-{
+        const sqlite3_api_routines *pApi) {
     assert_nonnull(db);
     assert_nonnull(pzErrMsg);
     assert_nonnull(pApi);
@@ -217,9 +215,9 @@ int sqlite3_extension_init(
     assert_eq(pFts5Api->iVersion, 2, %d);
 
     fts5_tokenizer t = {
-        .xCreate = ngram_create,
-        .xDelete = ngram_delete,
-        .xTokenize = ngram_tokenize,
+            .xCreate = ngram_create,
+            .xDelete = ngram_delete,
+            .xTokenize = ngram_tokenize,
     };
     return pFts5Api->xCreateTokenizer(pFts5Api, LIBNAME, (void *) pFts5Api, &t, NULL);
 }

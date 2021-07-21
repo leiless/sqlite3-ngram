@@ -16,8 +16,7 @@
  *
  * @see:            https://stackoverflow.com/a/14176593/10725426
  */
-static int parse_long(const char *str, char delim, int base, long *val)
-{
+static int parse_long(const char *str, char delim, int base, long *val) {
     char *p;
     errno = 0;
     long n = strtol(str, &p, base);
@@ -26,8 +25,7 @@ static int parse_long(const char *str, char delim, int base, long *val)
     return ok;
 }
 
-int parse_u32(const char *str, char delim, int base, u32 *val)
-{
+int parse_u32(const char *str, char delim, int base, u32 *val) {
     long n;
     int ok = parse_long(str, delim, base, &n);
     if (ok) {
