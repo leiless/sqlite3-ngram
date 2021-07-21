@@ -1,0 +1,14 @@
+.idea/
+
+sqlite
+sqlite-amalgamation-*/
+
+cmake-build-debug/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+*.zip
+*.so
+
