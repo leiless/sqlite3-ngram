@@ -11,4 +11,6 @@ cmake_install.cmake
 
 *.zip
 *.so
+*.dylib
+*.dll
 
