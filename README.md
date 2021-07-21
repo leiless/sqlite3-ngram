@@ -3,6 +3,6 @@
 ```bash
 $ cmake .
 $ make
-# Check the libfts5_ngram_tokenizer.so
+# Check the libngram-porter.so
 ```
 
