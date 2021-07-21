@@ -142,8 +142,8 @@ const char * x_bname_dfc95d52(const char *path)
 #include <unistd.h>
 #define COL(col)            (isatty(fileno(stderr)) ? (COL_##col) : COL_NONE)
 #else
-/* XXX: Assume it's colorized output */
-#define COL(col)            (col)
+/* Eat color strings */
+#define COL(col)            ""
 #endif
 
 #define assertf(e, fmt, ...)                                                        \
@@ -151,7 +151,7 @@ const char * x_bname_dfc95d52(const char *path)
         COL(RED), #e, COL(RST),                                                     \
         ##__VA_ARGS__,                                                              \
         COL(GRAY), x_bname_dfc95d52(__FILE0__), __LINE__, __func__, COL(RST))
-#else
+#else   /* ASSERTF_DISABLE */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -176,9 +176,12 @@ int __vunused(void *arg, ...)
 }
 #endif
 
+/* Fix GitHub #2 implicit declaration of function 'COL' */
+#define COL(col)    ""
+
 #include <stdint.h>
 #define assertf(e, fmt, ...)        (void) __vunused((void *) (uintptr_t) (e), fmt, ##__VA_ARGS__)
-#endif
+#endif  /* ASSERTF_DISABLE */
 
 #ifdef _WIN32
 #define __unreachable()     __assume(0)
