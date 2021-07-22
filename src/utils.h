@@ -9,7 +9,7 @@
 
 #define UNUSED(e, ...)      (void) ((void) (e), ##__VA_ARGS__)
 
-#define LIBNAME             "ngram"
+#define LIBNAME             "ngram-porter"
 
 // see:
 //  https://misc.flogisoft.com/bash/tip_colors_and_formatting
