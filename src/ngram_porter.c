@@ -173,7 +173,8 @@ static int ngram_tokenize(
     ngram_tokenizer_t *tok = (ngram_tokenizer_t *) pTok;
     LOG_DBG("%u-gram tokenizing...", tok->ngram);
     LOG_DBG("pTok: %p pCtx: %p flags: %#x", pTok, pCtx, flags);
-    LOG_DBG("pText: %s nText: %d", pText, nText);
+    // [quote] ... pText may or may not be nul-terminated.
+    LOG_DBG("nText: %d pText: %.*s", nText, nText, pText);
     LOG_DBG("xToken: %p", xToken);
 
     // TODO: do real tokenize work
