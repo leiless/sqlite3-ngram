@@ -23,4 +23,5 @@
 #define LOG_DBG(fmt, ...)   LOG("[" _COLOR_GREEN "DBG" _COLOR_RESET "] (%s:%d) " fmt, __BASE_FILE__, __LINE__, ##__VA_ARGS__)
 #define LOG_ERR(fmt, ...)   _LOG(stderr, "[" _COLOR_RED "ERR" _COLOR_RESET "] " fmt, ##__VA_ARGS__)
 
-int parse_u32(const char *str, char delim, int base, u32 *);
+int parse_u32(const char *, char, int, u32 *);
+int utf8_char_count(char);
