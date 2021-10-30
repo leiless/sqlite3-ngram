@@ -106,7 +106,6 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
                 LOG_ERR("%u-gram is out of range, should in range [%d, %d]", gram, MIN_GRAM, MAX_GRAM);
                 goto out_fail;
             }
-            LOG_DBG("n-gram = %u", gram);
             tok->ngram = gram;
         } else {
             LOG_ERR("unrecognizable option at index %d: %s", i, azArg[i]);
@@ -114,6 +113,7 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
         }
     }
 
+    LOG_DBG("n-gram = %u", tok->ngram);
     *ppOut = (Fts5Tokenizer *) tok;
     return SQLITE_OK;
 
