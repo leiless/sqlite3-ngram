@@ -189,7 +189,7 @@ static int ngram_tokenize(
 __declspec(dllexport)
 #endif
 
-int sqlite3_extension_init(
+int sqlite3_ngramporter_init(
         sqlite3 *db,
         char **pzErrMsg,
         const sqlite3_api_routines *pApi) {
@@ -204,7 +204,7 @@ int sqlite3_extension_init(
     LOG("HEAD commit: %s", BUILD_HEAD_COMMIT);
     LOG("Built by %s at %s", BUILD_USER, BUILD_TIMESTAMP);
     LOG("SQLite3 compile-time version: %s", SQLITE_VERSION);
-    LOG("SQLite3 dynamic-load version: %s", sqlite3_libversion());
+    LOG("SQLite3 run-time version: %s", sqlite3_libversion());
 
     fts5_api *pFts5Api = fts5_api_from_db(db);
     if (pFts5Api == NULL) {
