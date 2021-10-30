@@ -43,7 +43,7 @@ int parse_u32(const char *str, char delim, int base, u32 *val) {
  * Count how many bytes an UTF-8 character occupied
  *
  * @c       The UTF8 character starting code point
- * @return  -1 if it's not a valid UTF-8 character
+ * @return  0 if it's not a valid UTF-8 character
  *
  * see:
  *  https://en.wikipedia.org/wiki/UTF-8#Encoding
@@ -59,7 +59,7 @@ int utf8_char_count(char c) {
         c <<= 1;
     }
     if (n == 1) {
-        return -1;
+        return 0;
     }
     return n ? n : 1;
 }

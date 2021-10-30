@@ -6,6 +6,7 @@
  */
 
 #include <string.h>
+#include <ctype.h>
 
 #include "sqlite/sqlite3ext.h"      /* Do not use <sqlite3.h>! */
 
@@ -137,6 +138,26 @@ static void ngram_delete(Fts5Tokenizer *pTok) {
     sqlite3_free(tok);
 }
 
+typedef enum {
+    DIGIT,
+    SPACE_OR_CONTROL,
+    ALPHABETIC,
+    OTHER
+} token_category_t;
+
+static token_category_t get_token_category(char c) {
+    if (isdigit(c)) {
+        return DIGIT;
+    }
+    if (isspace(c) || iscntrl(c)) {
+        return SPACE_OR_CONTROL;
+    }
+    if (isalpha(c)) {
+        return ALPHABETIC;
+    }
+    return OTHER;
+}
+
 typedef int (*xTokenCallback)(
         void *pCtx,         /* Copy of 2nd argument to xTokenize() */
         int tflags,         /* Mask of FTS5_TOKEN_* flags */
@@ -177,8 +198,58 @@ static int ngram_tokenize(
     LOG_DBG("nText: %d pText: %.*s", nText, nText, pText);
     LOG_DBG("xToken: %p", xToken);
 
-    // TODO: do real tokenize work
+    int iStart = 0;
+    int iEnd = 0;
+    int nthToken = 0;
+    while (iEnd < nText) {
+        u32 gram = 0;
 
+        while (gram < tok->ngram) {
+            token_category_t category = get_token_category(pText[iEnd]);
+
+            if (category == OTHER) {
+                int len = utf8_char_count(pText[iEnd]);
+                if (len <= 0) {
+                    LOG_ERR("Met non-UTF8 character at index %d", iEnd);
+                    return SQLITE_ERROR;
+                }
+                iEnd += len;
+            } else {
+                while (++iEnd < nText && get_token_category(pText[iEnd]) == category) {
+                    // continue
+                }
+            }
+
+            if (iEnd > nText) {
+                goto out;
+            }
+
+            if (category != SPACE_OR_CONTROL) {
+                gram++;
+            }
+        }
+
+        if (gram != 0) {
+            const char *token = &pText[iStart];
+            int tokenLen = iEnd - iStart;
+
+            nthToken++;
+            LOG_DBG("Token#%d: len: %d str: %.*s", nthToken, tokenLen, tokenLen, token);
+
+            int rc = xToken(pCtx, 0, token, tokenLen, iStart, iEnd);
+            if (rc != SQLITE_OK) {
+                return rc;
+            }
+        }
+
+        iStart = iEnd;
+    }
+
+    out:
+    if (iEnd != nText) {
+        // Certainly not a valid UTF-8 string
+        return SQLITE_ERROR;
+    }
     return SQLITE_OK;
 }
 
