@@ -128,7 +128,7 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
  * Fts5 guarantees that this function will be invoked exactly once for each successful call to xCreate().
  */
 static void ngram_delete(Fts5Tokenizer *pTok) {
-    LOG_DBG("Freeing FTS5 ngram tokenizer...");
+    LOG_DBG("Freeing FTS5 " LIBNAME " tokenizer...");
 
     assert_nonnull(pTok);
     ngram_tokenizer_t *tok = (ngram_tokenizer_t *) pTok;
@@ -203,6 +203,7 @@ int sqlite3_ngramporter_init(
     //  so all sqlite3_*() functions can be used.
     SQLITE_EXTENSION_INIT2(pApi)
 
+    LOG("Loading " LIBNAME);
     LOG("HEAD commit: %s", BUILD_HEAD_COMMIT);
     LOG("Built by %s at %s", BUILD_USER, BUILD_TIMESTAMP);
     LOG("SQLite3 compile-time version: %s", SQLITE_VERSION);
