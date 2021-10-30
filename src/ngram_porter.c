@@ -55,7 +55,7 @@ static fts5_api *fts5_api_from_db(sqlite3 *db) {
 //  7.1. Custom Tokenizers
 //  https://sqlite.org/fts5.html#custom_tokenizers
 
-#define MIN_GRAM        1
+#define MIN_GRAM        1   /* Essentially strstr(3) */
 #define MAX_GRAM        4
 #define DEFAULT_GRAM    2
 
@@ -106,16 +106,17 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
                 LOG_ERR("%u-gram is out of range, should in range [%d, %d]", gram, MIN_GRAM, MAX_GRAM);
                 goto out_fail;
             }
-            LOG_DBG("Set gram to %u", gram);
+            LOG_DBG("n-gram = %u", gram);
             tok->ngram = gram;
         } else {
-            LOG_ERR("unrecognizable option: %s", azArg[i]);
+            LOG_ERR("unrecognizable option at index %d: %s", i, azArg[i]);
             goto out_fail;
         }
     }
 
     *ppOut = (Fts5Tokenizer *) tok;
     return SQLITE_OK;
+
     out_fail:
     sqlite3_free(tok);
     return SQLITE_ERROR;
