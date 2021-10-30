@@ -204,7 +204,7 @@ static int ngram_tokenize(
     while (iEnd < nText) {
         u32 gram = 0;
 
-        while (gram < tok->ngram) {
+        while (gram < tok->ngram && iEnd < nText) {
             token_category_t category = get_token_category(pText[iEnd]);
 
             if (category == OTHER) {
@@ -218,10 +218,6 @@ static int ngram_tokenize(
                 while (++iEnd < nText && get_token_category(pText[iEnd]) == category) {
                     // continue
                 }
-            }
-
-            if (iEnd > nText) {
-                goto out;
             }
 
             if (category != SPACE_OR_CONTROL) {
@@ -245,7 +241,6 @@ static int ngram_tokenize(
         iStart = iEnd;
     }
 
-    out:
     if (iEnd != nText) {
         // Certainly not a valid UTF-8 string
         return SQLITE_ERROR;
