@@ -129,10 +129,11 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
  */
 static void ngram_delete(Fts5Tokenizer *pTok) {
     LOG_DBG("Freeing FTS5 ngram tokenizer...");
-    LOG_DBG("pTok: %p", pTok);
 
     assert_nonnull(pTok);
     ngram_tokenizer_t *tok = (ngram_tokenizer_t *) pTok;
+    LOG_DBG("pTok: %p ngram: %u", tok, tok->ngram);
+
     sqlite3_free(tok);
 }
 
