@@ -1,8 +1,7 @@
-# HOWTO build SQLite3 FTS5 `ngram-porter` tokenizer
+# HOWTO build SQLite3 FTS5 `ngram_porter` tokenizer
 
 ```bash
-$ cmake .
-$ make
-# Check the libngram-porter.so
+./download-sqlite.sh
+./build.sh
 ```
 
