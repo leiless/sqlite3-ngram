@@ -203,9 +203,11 @@ static int ngram_tokenize(
     int nthToken = 0;
     while (iEnd < nText) {
         u32 gram = 0;
+        int iStartNext = 0;
 
         while (gram < tok->ngram && iEnd < nText) {
             token_category_t category = get_token_category(pText[iEnd]);
+            int iEndPrev = iEnd;
 
             if (category == OTHER) {
                 int len = utf8_char_count(pText[iEnd]);
@@ -222,6 +224,10 @@ static int ngram_tokenize(
 
             if (category != SPACE_OR_CONTROL) {
                 gram++;
+                if (tok->ngram == 1 || gram == 2) {
+                    assert_eq(iStartNext, 0, %d);
+                    iStartNext = iEndPrev;
+                }
             }
         }
 
@@ -238,7 +244,12 @@ static int ngram_tokenize(
             }
         }
 
-        iStart = iEnd;
+        if (iStartNext != 0) {
+            // Move one-gram only
+            iStart = iEnd = iStartNext;
+        } else {
+            iStart = iEnd;
+        }
     }
 
     if (iEnd != nText) {
