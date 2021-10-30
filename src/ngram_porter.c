@@ -231,7 +231,7 @@ static int ngram_tokenize(
             }
         }
 
-        if (gram != 0) {
+        if (gram == tok->ngram) {
             const char *token = &pText[iStart];
             int tokenLen = iEnd - iStart;
 
@@ -242,6 +242,9 @@ static int ngram_tokenize(
             if (rc != SQLITE_OK) {
                 return rc;
             }
+        } else {
+            // Cannot fulfill ngram, meaning we're done
+            break;
         }
 
         if (iStartNext != 0) {
