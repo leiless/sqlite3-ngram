@@ -224,7 +224,7 @@ static int ngram_tokenize(
 
             if (category != SPACE_OR_CONTROL) {
                 gram++;
-                if (tok->ngram == 1 || gram == 2) {
+                if (gram == 2) {
                     assert_eq(iStartNext, 0, %d);
                     iStartNext = iEndPrev;
                 }
