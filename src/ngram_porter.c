@@ -1,5 +1,5 @@
 /**
- * SQLite3 FTS5 N-gram tokenizer implementation
+ * SQLite3 FTS5 ngram tokenizer implementation
  *
  * Created: Oct 19, 2020.
  * see: LICENSE.
