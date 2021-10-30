@@ -9,7 +9,7 @@ add_compile_options(-Wall -Wextra -g -DDEBUG -O0)
 # TODO: Stringify CMAKE_CXX_FLAGS
 
 execute_process(
-        COMMAND git describe --dirty --always
+        COMMAND git describe --dirty --always --abbrev=7
         OUTPUT_VARIABLE BUILD_HEAD_COMMIT
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )

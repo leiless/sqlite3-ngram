@@ -203,7 +203,6 @@ int sqlite3_ngramporter_init(
     //  so all sqlite3_*() functions can be used.
     SQLITE_EXTENSION_INIT2(pApi)
 
-    LOG("Loading " LIBNAME);
     LOG("HEAD commit: %s", BUILD_HEAD_COMMIT);
     LOG("Built by %s at %s", BUILD_USER, BUILD_TIMESTAMP);
     LOG("SQLite3 compile-time version: %s", SQLITE_VERSION);
