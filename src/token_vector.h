@@ -28,5 +28,18 @@ public:
     const std::vector<token> &get_tokens() const;
 
 private:
+    typedef enum {
+        DIGIT,
+        SPACE_OR_CONTROL,
+        ALPHABETIC,
+        OTHER
+    } token_category_t;
+
+    static token_category_t token_category(char);
+
+    static int utf8_char_count(char);
+
+    const char *pText;
+    int nText;
     std::vector<token> tokens;
 };

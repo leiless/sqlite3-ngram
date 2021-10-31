@@ -196,10 +196,6 @@ static int ngram_tokenize(
     DLOG(INFO) << "nText: " << nText << " pText: " << std::string(pText, 0, nText);
     DLOG(INFO) << "xToken: " << xToken;
 
-    int iStart = 0;
-    int iEnd = 0;
-    int nthToken = 0;
-
     token_vector tv = token_vector(pText, nText);
     if (!tv.tokenize()) {
         return SQLITE_ERROR;
@@ -207,6 +203,11 @@ static int ngram_tokenize(
     for (const token &t: tv.get_tokens()) {
         // TODO:
     }
+
+#if 0
+    int iStart = 0;
+    int iEnd = 0;
+    int nthToken = 0;
 
     while (iEnd < nText) {
         int gram = 0;
@@ -283,6 +284,8 @@ static int ngram_tokenize(
         // Certainly not a valid UTF-8 string
         return SQLITE_ERROR;
     }
+#endif
+
     return SQLITE_OK;
 }
 
