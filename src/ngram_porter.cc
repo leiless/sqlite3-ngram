@@ -133,8 +133,6 @@ static void ngram_delete(Fts5Tokenizer *pTok) {
     DLOG(INFO) << "pTok: " << tok << " ngram: " << tok->ngram;
 
     sqlite3_free(tok);
-
-    google::ShutdownGoogleLogging();
 }
 
 typedef enum {
@@ -255,7 +253,7 @@ static int ngram_tokenize(
             int tokenLen = iEnd - iStart;
 
             nthToken++;
-            DLOG(INFO) << "Token#" << nthToken << " len: " << tokenLen << " str" << std::string(token, 0, tokenLen);
+            DLOG(INFO) << "Token#" << nthToken << " len: " << tokenLen << " str: " << std::string(token, 0, tokenLen);
 
             int rc = xToken(pCtx, 0, token, tokenLen, iStart, iEnd);
             if (rc != SQLITE_OK) {
@@ -286,6 +284,8 @@ static int ngram_tokenize(
  */
 #ifdef _WIN32
 __declspec(dllexport)
+#else
+extern "C"
 #endif
 
 int sqlite3_ngramporter_init(
@@ -311,7 +311,7 @@ int sqlite3_ngramporter_init(
     if (pFts5Api == nullptr) {
         int err = sqlite3_errcode(db);
         CHECK_NE(err, 0);
-        *pzErrMsg = sqlite3_mprintf("%s: %d %s", __func__, err, sqlite3_errstr(err));
+        *pzErrMsg = sqlite3_mprintf("%s(): err: %d msg: %s", __func__, err, sqlite3_errstr(err));
         return err;
     }
     CHECK_EQ(pFts5Api->iVersion, 2);
