@@ -240,6 +240,19 @@ static int ngram_tokenize(
         if (!arr.empty()) {
             std::cout << std::endl;
         }
+
+        if (!arr.empty()) {
+            int iStart = arr[0].get_iStart();
+            int iEnd = arr[arr.size() - 1].get_iEnd();
+            CHECK_LT(iStart, iEnd);
+            std::stringstream ss;
+            for (const token &t: arr) {
+                ss << t.get_str();
+            }
+            std::string s = ss.str();
+            DLOG(INFO) << "> final s = '" << s << "'" << " iStart = " << iStart << " iEnd = " << iEnd;
+            xToken(pCtx, 0, s.c_str(), (int) s.length(), iStart, iEnd);
+        }
     }
 
     return SQLITE_OK;
