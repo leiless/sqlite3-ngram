@@ -25,9 +25,9 @@ token_vector::token_vector(const char *pText, int nText) {
     CHECK_GE(nText, 0);
 }
 
-std::pair<bool, std::string> token_vector::tokenize() {
+bool token_vector::tokenize() {
 
-    return std::make_pair(true, "");
+    return true;
 }
 
 // Call only after a successful call of tokenize()

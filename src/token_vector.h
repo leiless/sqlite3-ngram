@@ -23,7 +23,7 @@ class token_vector {
 public:
     token_vector(const char *, int);
 
-    std::pair<bool, std::string> tokenize();
+    bool tokenize();
 
     const std::vector<token> &get_tokens() const;
 
