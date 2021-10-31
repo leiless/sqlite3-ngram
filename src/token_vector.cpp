@@ -37,6 +37,7 @@ token_vector::token_vector(const char *pText, int nText) {
     CHECK_GE(nText, 0);
     this->pText = pText;
     this->nText = nText;
+    this->ok = false;
 }
 
 bool token_vector::tokenize() {
