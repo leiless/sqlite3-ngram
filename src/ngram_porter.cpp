@@ -203,6 +203,7 @@ __declspec(dllexport)
 #else
 extern "C"
 #endif
+UNUSED_ATTR
 int sqlite3_ngramporter_init(
         sqlite3 *db,
         char **pzErrMsg,

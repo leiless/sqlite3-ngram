@@ -5,7 +5,7 @@
 #include <iostream>
 #include <utility>
 
-token::token(std::string str, int iStart, int iEnd) {
+token::token(std::string str, int iStart, int iEnd, token_category_t category) {
     CHECK_GE(iStart, 0);
     CHECK_GE(iEnd, 0);
     CHECK_LT(iStart, iEnd);
@@ -13,6 +13,7 @@ token::token(std::string str, int iStart, int iEnd) {
     this->str = std::move(str);
     this->iStart = iStart;
     this->iEnd = iEnd;
+    this->category = category;
 }
 
 const std::string &token::get_str() const {
@@ -25,6 +26,10 @@ int token::get_iStart() const {
 
 int token::get_iEnd() const {
     return iEnd;
+}
+
+token_category_t token::get_category() const {
+    return category;
 }
 
 token_vector::token_vector(const char *pText, int nText) {
@@ -60,7 +65,7 @@ bool token_vector::tokenize() {
 
             // Will properly null-terminate the resulting std::string
             std::string s(pText + iStart, iEnd - iStart);
-            tokens.emplace_back(s, iStart, iEnd);
+            tokens.emplace_back(s, iStart, iEnd, category);
         }
 
         iStart = iEnd;
@@ -78,7 +83,7 @@ const std::vector<token> &token_vector::get_tokens() const {
     return tokens;
 }
 
-token_vector::token_category_t token_vector::token_category(char c) {
+token_category_t token_vector::token_category(char c) {
     if (isdigit(c)) {
         return DIGIT;
     }

@@ -3,9 +3,16 @@
 #include <string>
 #include <vector>
 
+typedef enum {
+    DIGIT,
+    SPACE_OR_CONTROL,
+    ALPHABETIC,
+    OTHER
+} token_category_t;
+
 class token {
 public:
-    token(std::string, int, int);
+    token(std::string, int, int, token_category_t);
 
     const std::string &get_str() const;
 
@@ -13,10 +20,13 @@ public:
 
     int get_iEnd() const;
 
+    token_category_t get_category() const;
+
 private:
     std::string str;
     int iStart; // Inclusive
     int iEnd; // Exclusive
+    token_category_t category;
 };
 
 class token_vector {
@@ -28,13 +38,6 @@ public:
     const std::vector<token> &get_tokens() const;
 
 private:
-    typedef enum {
-        DIGIT,
-        SPACE_OR_CONTROL,
-        ALPHABETIC,
-        OTHER
-    } token_category_t;
-
     static token_category_t token_category(char);
 
     static int utf8_char_count(char);
