@@ -15,4 +15,5 @@ SELECT * FROM t1('2021年');
 SELECT * FROM t1('使用');
 SELECT * FROM t1('Linux上');
 SELECT * FROM t1('Linux上如');
+SELECT * FROM t1('微信');
 

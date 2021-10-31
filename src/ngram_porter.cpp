@@ -8,6 +8,7 @@
 #include <cstring>
 #include <glog/logging.h>
 #include <iostream>
+#include <algorithm>
 
 #include "sqlite/sqlite3ext.h"      /* Do not use <sqlite3.h>! */
 
@@ -60,6 +61,7 @@ static fts5_api *fts5_api_from_db(sqlite3 *db) {
 
 typedef struct {
     int ngram;
+    bool case_sensitive;
 } ngram_tokenizer_t;
 
 /**
@@ -106,13 +108,16 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
                 goto out_fail;
             }
             tok->ngram = gram;
+        } else if (!strcmp(azArg[i], "case_sensitive")) {
+            tok->case_sensitive = true;
         } else {
             LOG(ERROR) << "unrecognizable option at index " << i << ": " << azArg[i];
             goto out_fail;
         }
     }
 
-    DLOG(INFO) << "n-gram = " << tok->ngram;
+    DLOG(INFO) << "ngram = " << tok->ngram;
+    DLOG(INFO) << "case_sensitive = " << tok->case_sensitive;
     *ppOut = (Fts5Tokenizer *) tok;
     return SQLITE_OK;
 
@@ -246,6 +251,10 @@ static int ngram_tokenize(
                 ss << t.get_str();
             }
             std::string s = ss.str();
+            if (!tok->case_sensitive) {
+                // https://stackoverflow.com/questions/313970/how-to-convert-an-instance-of-stdstring-to-lower-case/313990#313990
+                std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+            }
             DLOG(INFO) << "> result token = '" << s << "'"
                        << " iStart = " << iStart
                        << " iEnd = " << iEnd;
