@@ -181,6 +181,11 @@ static int ngram_tokenize(
     DLOG(INFO) << "nText: " << nText << " pText: " << std::string(pText, 0, nText);
     DLOG(INFO) << "xToken: " << xToken;
 
+    if (utf8_validatestr(reinterpret_cast<const u_int8_t *>(pText), nText) != 0) {
+        LOG(ERROR) << "Met invalid UTF-8 character(s) in the input text, please check the text or issue a bug report";
+        return SQLITE_ERROR;
+    }
+
     token_vector tv = token_vector(pText, nText);
     if (!tv.tokenize()) {
         return SQLITE_ERROR;
