@@ -6,7 +6,6 @@
  */
 
 #include <cstring>
-#include <cctype>
 #include <glog/logging.h>
 
 #include "sqlite/sqlite3ext.h"      /* Do not use <sqlite3.h>! */
@@ -134,26 +133,6 @@ static void ngram_delete(Fts5Tokenizer *pTok) {
     DLOG(INFO) << "pTok: " << tok << " ngram: " << tok->ngram;
 
     sqlite3_free(tok);
-}
-
-typedef enum {
-    DIGIT,
-    SPACE_OR_CONTROL,
-    ALPHABETIC,
-    OTHER
-} token_category_t;
-
-static token_category_t get_token_category(char c) {
-    if (isdigit(c)) {
-        return DIGIT;
-    }
-    if (isspace(c) || iscntrl(c)) {
-        return SPACE_OR_CONTROL;
-    }
-    if (isalpha(c)) {
-        return ALPHABETIC;
-    }
-    return OTHER;
 }
 
 typedef int (*xTokenCallback)(

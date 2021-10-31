@@ -9,5 +9,3 @@
 #define LIBNAME             "ngram_porter"
 
 int parse_int(const char *str, char delim, int base, int *val);
-
-int utf8_char_count(char);
