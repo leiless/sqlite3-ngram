@@ -194,6 +194,28 @@ static int ngram_tokenize(
         for (int j = 0; j < tok->ngram; j++) {
             // Avoid out of array boundary
             if (i + j >= tokens.size()) {
+#if 1
+                if (tokens.size() >= (size_t) tok->ngram) {
+                    bool same_category = true;
+
+                    for (int k = 0; k < tok->ngram; k++) {
+                        token_category_t category = tokens[tokens.size() - k - 1].get_category();
+                        if (k != 0) {
+                            if (category != prev_category) {
+                                same_category = false;
+                                break;
+                            }
+                        }
+                        prev_category = category;
+                    }
+
+                    // Same category meaning previously last ngram token had been added
+                    // Thus we don't need to cut again(unless they're in different categories)
+                    if (same_category) {
+                        arr.clear();
+                    }
+                }
+#else
                 if (tokens.size() >= 2) {
                     prev_category = tokens[tokens.size() - 2].get_category();
                     token_category_t category = tokens[tokens.size() - 1].get_category();
@@ -201,6 +223,7 @@ static int ngram_tokenize(
                         arr.clear();
                     }
                 }
+#endif
                 break;
             }
 
