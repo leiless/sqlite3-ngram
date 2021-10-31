@@ -14,4 +14,5 @@ SELECT * FROM t1('在Ubuntu');
 SELECT * FROM t1('2021年');
 SELECT * FROM t1('使用');
 SELECT * FROM t1('Linux上');
+SELECT * FROM t1('Linux上如');
 

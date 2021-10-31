@@ -71,11 +71,13 @@ bool token_vector::tokenize() {
         // Certainly not a valid UTF-8 string
         return false;
     }
+    ok = true;
     return true;
 }
 
 // Call only after a successful call of tokenize()
 const std::vector<token> &token_vector::get_tokens() const {
+    CHECK(ok) << "Make sure tokenize() has been successfully called";
     return tokens;
 }
 

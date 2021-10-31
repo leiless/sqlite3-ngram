@@ -45,4 +45,5 @@ private:
     const char *pText;
     int nText;
     std::vector<token> tokens;
+    bool ok;
 };

@@ -181,7 +181,9 @@ static int ngram_tokenize(
         return SQLITE_ERROR;
     }
     for (const token &t: tv.get_tokens()) {
-        DLOG(INFO) << "> s = '" << t.get_str() << "' i = " << t.get_iStart() << " j = " << t.get_iEnd()
+        DLOG(INFO) << "> token = '" << t.get_str()
+                   << "' iStart = " << t.get_iStart()
+                   << " iEnd = " << t.get_iEnd()
                    << " category = " << t.get_category();
     }
 
@@ -211,6 +213,7 @@ static int ngram_tokenize(
                     // Same category meaning previously last ngram token had been added
                     // Thus we don't need to cut again(unless they're in different categories)
                     if (same_category) {
+                        DLOG(INFO) << "Don't do tokenize for last N non-complete terms since they're in same category";
                         arr.clear();
                     }
                 }
@@ -250,7 +253,9 @@ static int ngram_tokenize(
                 ss << t.get_str();
             }
             std::string s = ss.str();
-            DLOG(INFO) << "> final s = '" << s << "'" << " iStart = " << iStart << " iEnd = " << iEnd;
+            DLOG(INFO) << "> result token = '" << s << "'"
+                       << " iStart = " << iStart
+                       << " iEnd = " << iEnd;
             xToken(pCtx, 0, s.c_str(), (int) s.length(), iStart, iEnd);
         }
     }
