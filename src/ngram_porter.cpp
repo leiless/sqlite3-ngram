@@ -7,6 +7,7 @@
 
 #include <cstring>
 #include <glog/logging.h>
+#include <iostream>
 
 #include "sqlite/sqlite3ext.h"      /* Do not use <sqlite3.h>! */
 
@@ -182,6 +183,42 @@ static int ngram_tokenize(
     for (const token &t: tv.get_tokens()) {
         DLOG(INFO) << "> s = '" << t.get_str() << "' i = " << t.get_iStart() << " j = " << t.get_iEnd()
                    << " category = " << t.get_category();
+    }
+
+    const std::vector<token> &tokens = tv.get_tokens();
+
+    for (size_t i = 0; i < tokens.size(); i++) {
+        std::vector<token> arr;
+
+        token_category_t prev_category;
+        for (int j = 0; j < tok->ngram; j++) {
+            // Avoid out of array boundary
+            if (i + j >= tokens.size()) {
+                break;
+            }
+
+            const token &curr_token = tokens[i + j];
+
+            if (j != 0) {
+                if (curr_token.get_category() != OTHER) {
+                    break;
+                }
+                if (curr_token.get_category() != prev_category) {
+                    break;
+                }
+            }
+
+            arr.emplace_back(curr_token);
+            prev_category = curr_token.get_category();
+        }
+
+        DLOG(INFO) << ">>> i = " << i << " size: " << arr.size();
+        for (const token &t: arr) {
+            std::cout << t.get_str() << " ";
+        }
+        if (!arr.empty()) {
+            std::cout << std::endl;
+        }
     }
 
     return SQLITE_OK;
