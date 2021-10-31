@@ -200,7 +200,12 @@ static int ngram_tokenize(
     int iEnd = 0;
     int nthToken = 0;
 
-    const token_vector &tv = token_vector(pText, nText);
+    token_vector tv = token_vector(pText, nText);
+    auto result = tv.tokenize();
+    if (!result.first) {
+        LOG(ERROR) << result.second;
+        return SQLITE_ERROR;
+    }
     for (const token &t: tv.get_tokens()) {
         // TODO:
     }
