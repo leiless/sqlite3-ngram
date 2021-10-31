@@ -91,6 +91,9 @@ token_category_t token_vector::token_category(char c) {
     if (isalpha(c)) {
         return ALPHABETIC;
     }
+    if (ispunct(c)) {
+        return PUNCTUATION;
+    }
     return OTHER;
 }
 

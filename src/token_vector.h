@@ -7,6 +7,7 @@ typedef enum {
     DIGIT,
     SPACE_OR_CONTROL,
     ALPHABETIC,
+    PUNCTUATION,
     OTHER
 } token_category_t;
 

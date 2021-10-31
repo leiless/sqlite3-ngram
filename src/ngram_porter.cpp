@@ -213,7 +213,8 @@ static int ngram_tokenize(
                     // Same category meaning previously last ngram token had been added
                     // Thus we don't need to cut again(unless they're in different categories)
                     if (same_category) {
-                        DLOG(INFO) << "Don't do tokenize for last N non-complete terms since they're in same category";
+                        DLOG(INFO)
+                                << "Don't do tokenize for the last N non-complete terms since they're in a same category";
                         arr.clear();
                     }
                 }
