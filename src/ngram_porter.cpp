@@ -236,14 +236,6 @@ static int ngram_tokenize(
             prev_category = curr_token.get_category();
         }
 
-        DLOG(INFO) << ">>> i = " << i << " size: " << arr.size();
-        for (const token &t: arr) {
-            std::cout << t.get_str() << " ";
-        }
-        if (!arr.empty()) {
-            std::cout << std::endl;
-        }
-
         if (!arr.empty()) {
             int iStart = arr[0].get_iStart();
             int iEnd = arr[arr.size() - 1].get_iEnd();
