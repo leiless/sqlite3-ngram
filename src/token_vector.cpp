@@ -108,8 +108,7 @@ token_category_t token_vector::token_category(char c) {
  *  https://en.wikipedia.org/wiki/UTF-8#Encoding
  *  https://stackoverflow.com/questions/64846096/utf-8-character-count/64846299#64846299
  *  https://xr.anadoxin.org/source/xref/macos-10.14.1-mojave/xnu-4903.221.2/bsd/vfs/vfs_utfconv.c#639
- *
- * TODO: introduce an UTF-8 library for robust determination
+ *  https://github.com/apple/darwin-xnu/blob/main/bsd/vfs/vfs_utfconv.c#L662
  */
 int token_vector::utf8_char_count(char c) {
     int n = 0;
