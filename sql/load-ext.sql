@@ -10,5 +10,6 @@ INSERT INTO t1 VALUES(' 2021 年 10 月，在 Ubuntu Linux 上如何使用WeChat
 SELECT * FROM t1('Ubuntu Linux');
 SELECT * FROM t1('如何');
 SELECT * FROM t1('在ubuntu');
+SELECT * FROM t1('在Ubuntu');
 SELECT * FROM t1('2021年');
 
