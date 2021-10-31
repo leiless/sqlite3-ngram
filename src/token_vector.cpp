@@ -42,7 +42,6 @@ token_vector::token_vector(const char *pText, int nText) {
 bool token_vector::tokenize() {
     int iStart = 0;
     int iEnd = 0;
-    int nthToken = 0;
 
     while (iEnd < nText) {
         token_category_t category = token_category(pText[iEnd]);
@@ -60,8 +59,6 @@ bool token_vector::tokenize() {
         }
 
         if (category != SPACE_OR_CONTROL) {
-            nthToken++;
-
             // Will properly null-terminate the resulting std::string
             std::string s(pText + iStart, iEnd - iStart);
             tokens.emplace_back(s, iStart, iEnd, category);
