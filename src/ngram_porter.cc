@@ -5,8 +5,8 @@
  * see: LICENSE.
  */
 
-#include <string.h>
-#include <ctype.h>
+#include <cstring>
+#include <cctype>
 
 #include "sqlite/sqlite3ext.h"      /* Do not use <sqlite3.h>! */
 
@@ -16,7 +16,6 @@ SQLITE_EXTENSION_INIT1
 
 #include "assertf.h"
 #include "utils.h"
-#include "types.h"
 
 /**
  * [qt.]
@@ -61,7 +60,7 @@ static fts5_api *fts5_api_from_db(sqlite3 *db) {
 #define DEFAULT_GRAM    2
 
 typedef struct {
-    u32 ngram;
+    int ngram;
 } ngram_tokenizer_t;
 
 /**
@@ -98,9 +97,9 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
                 goto out_fail;
             }
 
-            u32 gram;
-            if (!parse_u32(azArg[i], '\0', 10, &gram)) {
-                LOG_ERR("parse_u32() fail, str: %s", azArg[i]);
+            int gram;
+            if (!parse_int(azArg[i], '\0', 10, &gram)) {
+                LOG_ERR("parse_int() fail, str: %s", azArg[i]);
                 goto out_fail;
             }
             if (gram < MIN_GRAM || gram > MAX_GRAM) {
@@ -202,7 +201,7 @@ static int ngram_tokenize(
     int iEnd = 0;
     int nthToken = 0;
     while (iEnd < nText) {
-        u32 gram = 0;
+        int gram = 0;
         int iStartNext = 0;
         token_category_t prev_category = SPACE_OR_CONTROL;
         token_category_t category;

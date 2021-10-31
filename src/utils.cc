@@ -1,5 +1,6 @@
-#include <errno.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <cstdlib>
+#include <cstdint>
 
 #include "utils.h"
 
@@ -25,15 +26,15 @@ static int parse_long(const char *str, char delim, int base, long *val) {
     return ok;
 }
 
-int parse_u32(const char *str, char delim, int base, u32 *val) {
+int parse_int(const char *str, char delim, int base, int *val) {
     long n;
     int ok = parse_long(str, delim, base, &n);
     if (ok) {
-        if ((uint64_t) n & ~0xffffffffllu) {
+        if (((uint64_t) n) & ~0xffffffffllu) {
             errno = ERANGE;
             ok = 0;
         } else {
-            *val = (uint32_t) n;
+            *val = (int) n;
         }
     }
     return ok;
