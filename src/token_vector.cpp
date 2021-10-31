@@ -66,6 +66,10 @@ bool token_vector::tokenize() {
         iStart = iEnd;
     }
 
+    if (iEnd != nText) {
+        // Certainly not a valid UTF-8 string
+        return false;
+    }
     return true;
 }
 
