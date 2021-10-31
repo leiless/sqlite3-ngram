@@ -276,6 +276,12 @@ static int ngram_tokenize(
     return SQLITE_OK;
 }
 
+static fts5_tokenizer token_handle = {
+        .xCreate = ngram_create,
+        .xDelete = ngram_delete,
+        .xTokenize = ngram_tokenize,
+};
+
 /**
  * SQLite loadable extension entry point
  * see:
@@ -287,7 +293,6 @@ __declspec(dllexport)
 #else
 extern "C"
 #endif
-
 int sqlite3_ngramporter_init(
         sqlite3 *db,
         char **pzErrMsg,
@@ -316,10 +321,5 @@ int sqlite3_ngramporter_init(
     }
     CHECK_EQ(pFts5Api->iVersion, 2);
 
-    fts5_tokenizer t = {
-            .xCreate = ngram_create,
-            .xDelete = ngram_delete,
-            .xTokenize = ngram_tokenize,
-    };
-    return pFts5Api->xCreateTokenizer(pFts5Api, LIBNAME, (void *) pFts5Api, &t, nullptr);
+    return pFts5Api->xCreateTokenizer(pFts5Api, LIBNAME, (void *) pFts5Api, &token_handle, nullptr);
 }
