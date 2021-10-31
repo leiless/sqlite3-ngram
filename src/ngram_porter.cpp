@@ -14,7 +14,7 @@
 SQLITE_EXTENSION_INIT1
 
 #include "utils.h"
-#include "term_vector.h"
+#include "token_vector.h"
 
 /**
  * [qt.]
@@ -200,8 +200,8 @@ static int ngram_tokenize(
     int iEnd = 0;
     int nthToken = 0;
 
-    const term_vector &tv = term_vector(pText, nText);
-    for (const term &t: tv.get_terms()) {
+    const token_vector &tv = token_vector(pText, nText);
+    for (const token &t: tv.get_tokens()) {
         // TODO:
     }
 

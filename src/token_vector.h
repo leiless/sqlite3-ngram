@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
-class term {
+class token {
 public:
-    term(const char *, int, int);
+    token(const char *, int, int);
 
     const std::string &get_str() const;
 
@@ -19,12 +19,12 @@ private:
     int iEnd;
 };
 
-class term_vector {
+class token_vector {
 public:
-    term_vector(const char *, int);
+    token_vector(const char *, int);
 
-    const std::vector<term> &get_terms() const;
+    const std::vector<token> &get_tokens() const;
 
 private:
-    std::vector<term> terms;
+    std::vector<token> tokens;
 };
