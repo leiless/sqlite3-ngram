@@ -30,7 +30,8 @@ execute_process(
 add_compile_definitions(BUILD_USER="${BUILD_USER}")
 
 # see: https://github.com/google/glog#incorporating-glog-into-a-cmake-project
-add_subdirectory(deps/glog)
+#add_subdirectory(deps/glog)
+find_package(glog 0.6.0 REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
         src/ngram_porter.cc
