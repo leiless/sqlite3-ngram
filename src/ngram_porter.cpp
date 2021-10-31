@@ -194,6 +194,13 @@ static int ngram_tokenize(
         for (int j = 0; j < tok->ngram; j++) {
             // Avoid out of array boundary
             if (i + j >= tokens.size()) {
+                if (tokens.size() >= 2) {
+                    prev_category = tokens[tokens.size() - 2].get_category();
+                    token_category_t category = tokens[tokens.size() - 1].get_category();
+                    if (prev_category == category) {
+                        arr.clear();
+                    }
+                }
                 break;
             }
 
