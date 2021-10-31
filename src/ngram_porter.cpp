@@ -14,6 +14,7 @@
 SQLITE_EXTENSION_INIT1
 
 #include "utils.h"
+#include "term_vector.h"
 
 /**
  * [qt.]
@@ -198,6 +199,12 @@ static int ngram_tokenize(
     int iStart = 0;
     int iEnd = 0;
     int nthToken = 0;
+
+    const term_vector &tv = term_vector(pText, nText);
+    for (const term &t: tv.get_terms()) {
+        // TODO:
+    }
+
     while (iEnd < nText) {
         int gram = 0;
         int iStartNext = 0;
@@ -247,7 +254,7 @@ static int ngram_tokenize(
             }
         }
 
-        // Full ngram or ASCII-only term
+        // Full ngram or ASCII-only term_vector
         if (gram == tok->ngram || (gram != 0 && category != OTHER)) {
             const char *token = &pText[iStart];
             int tokenLen = iEnd - iStart;
