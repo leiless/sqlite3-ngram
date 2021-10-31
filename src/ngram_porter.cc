@@ -7,14 +7,12 @@
 
 #include <cstring>
 #include <cctype>
+#include <glog/logging.h>
 
 #include "sqlite/sqlite3ext.h"      /* Do not use <sqlite3.h>! */
 
 SQLITE_EXTENSION_INIT1
 
-#define ASSERTF_DEF_ONCE
-
-#include "assertf.h"
 #include "utils.h"
 
 /**
@@ -30,23 +28,23 @@ SQLITE_EXTENSION_INIT1
  *  https://archive.is/wip/B6gDa
  */
 static fts5_api *fts5_api_from_db(sqlite3 *db) {
-    assert_nonnull(db);
+    CHECK_NOTNULL(db);
 
-    fts5_api *pFts5Api = NULL;
-    sqlite3_stmt *pStmt = NULL;
+    fts5_api *pFts5Api = nullptr;
+    sqlite3_stmt *pStmt = nullptr;
 
-    if (sqlite3_prepare(db, "SELECT fts5(?1)", -1, &pStmt, 0) == SQLITE_OK) {
-        if (sqlite3_bind_pointer(pStmt, 1, (void *) &pFts5Api, "fts5_api_ptr", NULL) == SQLITE_OK) {
+    if (sqlite3_prepare(db, "SELECT fts5(?1)", -1, &pStmt, nullptr) == SQLITE_OK) {
+        if (sqlite3_bind_pointer(pStmt, 1, (void *) &pFts5Api, "fts5_api_ptr", nullptr) == SQLITE_OK) {
             int rc = sqlite3_step(pStmt);
-            assert_eq(rc, SQLITE_ROW, %d);
+            CHECK_EQ(rc, SQLITE_ROW);
             rc = sqlite3_step(pStmt);
-            assert_eq(rc, SQLITE_DONE, %d);
+            CHECK_EQ(rc, SQLITE_DONE);
         }
     }
 
     // [qt.] Invoking sqlite3_finalize() on a NULL pointer is a harmless no-op.
     int rc = sqlite3_finalize(pStmt);
-    assert_eq(rc, SQLITE_OK, %d);
+    CHECK_EQ(rc, SQLITE_OK);
 
     return pFts5Api;
 }
@@ -71,20 +69,20 @@ typedef struct {
  *  In this case, fts5 assumes that the final value of *ppOut is undefined.
  */
 static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer **ppOut) {
-    LOG_DBG("Creating FTS5 ngram tokenizer...");
-    LOG_DBG("pCtx: %p azArg: %p nArg: %d ppOut: %p", pCtx, azArg, nArg, ppOut);
+    DLOG(INFO) << "Creating FTS5 ngram tokenizer ...";
+    DLOG(INFO) << "pCtx: " << pCtx << " azArg: " << azArg << " nArg: " << nArg << " ppOut: " << ppOut;
 
-    assert_nonnull(pCtx);
-    assert_nonnull(azArg);
-    assert_ge(nArg, 0, %d);
-    assert_nonnull(ppOut);
+    CHECK_NOTNULL(pCtx);
+    CHECK_NOTNULL(azArg);
+    CHECK_GE(nArg, 0);
+    CHECK_NOTNULL(ppOut);
 
-    fts5_api *pFts5Api = (fts5_api *) pCtx;
+    auto *pFts5Api = (fts5_api *) pCtx;
     UNUSED(pFts5Api);
 
     auto *tok = (ngram_tokenizer_t *) sqlite3_malloc(sizeof(ngram_tokenizer_t));
-    if (tok == NULL) {
-        LOG_ERR("sqlite3_malloc() fail, size: %zu", sizeof(*tok));
+    if (tok == nullptr) {
+        LOG(ERROR) << "sqlite3_malloc() fail, size: " << sizeof(*tok);
         return SQLITE_NOMEM;
     }
     (void) memset(tok, 0, sizeof(*tok));
@@ -93,27 +91,27 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
     for (int i = 0; i < nArg; i++) {
         if (!strcmp(azArg[i], "gram")) {
             if (++i >= nArg) {
-                LOG_ERR("gram expected one argument, got nothing.");
+                LOG(ERROR) << "gram expected one argument, got nothing.";
                 goto out_fail;
             }
 
             int gram;
             if (!parse_int(azArg[i], '\0', 10, &gram)) {
-                LOG_ERR("parse_int() fail, str: %s", azArg[i]);
+                LOG(ERROR) << "parse_int() fail, str: " << azArg[i];
                 goto out_fail;
             }
             if (gram < MIN_GRAM || gram > MAX_GRAM) {
-                LOG_ERR("%u-gram is out of range, should in range [%d, %d]", gram, MIN_GRAM, MAX_GRAM);
+                LOG(ERROR) << gram << "-gram is out of range, should in range [" << MIN_GRAM << ", " << MAX_GRAM << "]";
                 goto out_fail;
             }
             tok->ngram = gram;
         } else {
-            LOG_ERR("unrecognizable option at index %d: %s", i, azArg[i]);
+            LOG(ERROR) << "unrecognizable option at index " << i << ": " << azArg[i];
             goto out_fail;
         }
     }
 
-    LOG_DBG("n-gram = %u", tok->ngram);
+    DLOG(INFO) << "n-gram = " << tok->ngram;
     *ppOut = (Fts5Tokenizer *) tok;
     return SQLITE_OK;
 
@@ -128,13 +126,15 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
  * Fts5 guarantees that this function will be invoked exactly once for each successful call to xCreate().
  */
 static void ngram_delete(Fts5Tokenizer *pTok) {
-    LOG_DBG("Freeing FTS5 " LIBNAME " tokenizer...");
+    DLOG(INFO) << "Freeing FTS5 " LIBNAME " tokenizer...";
 
-    assert_nonnull(pTok);
-    ngram_tokenizer_t *tok = (ngram_tokenizer_t *) pTok;
-    LOG_DBG("pTok: %p ngram: %u", tok, tok->ngram);
+    CHECK_NOTNULL(pTok);
+    auto *tok = (ngram_tokenizer_t *) pTok;
+    DLOG(INFO) << "pTok: " << tok << " ngram: " << tok->ngram;
 
     sqlite3_free(tok);
+
+    google::ShutdownGoogleLogging();
 }
 
 typedef enum {
@@ -181,21 +181,21 @@ static int ngram_tokenize(
         const char *pText,
         int nText,
         xTokenCallback xToken) {
-    assert_nonnull(pTok);
-    assert_nonnull(pCtx);
-    assert_nonnull(pText);
-    assert_ge(nText, 0, %d);
-    assert_nonnull(xToken);
+    CHECK_NOTNULL(pTok);
+    CHECK_NOTNULL(pCtx);
+    CHECK_NOTNULL(pText);
+    CHECK_GE(nText, 0);
+    CHECK_NOTNULL(xToken);
 
-    fts5_api *pFts5Api = (fts5_api *) pCtx;
+    auto *pFts5Api = (fts5_api *) pCtx;
     UNUSED(pFts5Api);
 
-    ngram_tokenizer_t *tok = (ngram_tokenizer_t *) pTok;
-    LOG_DBG("%u-gram tokenizing...", tok->ngram);
-    LOG_DBG("pTok: %p pCtx: %p flags: %#x", pTok, pCtx, flags);
+    auto *tok = (ngram_tokenizer_t *) pTok;
+    DLOG(INFO) << tok->ngram << "-gram tokenizing ...";
+    DLOG(INFO) << "pTok: " << pTok << " pCtx: " << pCtx << " flags: " << flags;
     // [quote] ... pText may or may not be nul-terminated.
-    LOG_DBG("nText: %d pText: %.*s", nText, nText, pText);
-    LOG_DBG("xToken: %p", xToken);
+    DLOG(INFO) << "nText: " << nText << " pText: " << std::string(pText, 0, nText);
+    DLOG(INFO) << "xToken: " << xToken;
 
     int iStart = 0;
     int iEnd = 0;
@@ -213,7 +213,7 @@ static int ngram_tokenize(
             if (category == OTHER) {
                 int len = utf8_char_count(pText[iEnd]);
                 if (len <= 0) {
-                    LOG_ERR("Met non-UTF8 character at index %d", iEnd);
+                    LOG(ERROR) << "Met non-UTF8 character at index " << iEnd;
                     return SQLITE_ERROR;
                 }
                 iEnd += len;
@@ -231,7 +231,7 @@ static int ngram_tokenize(
                         break;
                     }
                 } else if (gram == 2) {
-                    assert_eq(iStartNext, 0, %d);
+                    CHECK_EQ(iStartNext, 0);
                     iStartNext = iEndPrev;
                 }
             }
@@ -255,7 +255,7 @@ static int ngram_tokenize(
             int tokenLen = iEnd - iStart;
 
             nthToken++;
-            LOG_DBG("Token#%d: len: %d str: '%.*s'", nthToken, tokenLen, tokenLen, token);
+            DLOG(INFO) << "Token#" << nthToken << " len: " << tokenLen << " str" << std::string(token, 0, tokenLen);
 
             int rc = xToken(pCtx, 0, token, tokenLen, iStart, iEnd);
             if (rc != SQLITE_OK) {
@@ -292,32 +292,34 @@ int sqlite3_ngramporter_init(
         sqlite3 *db,
         char **pzErrMsg,
         const sqlite3_api_routines *pApi) {
-    assert_nonnull(db);
-    assert_nonnull(pzErrMsg);
-    assert_nonnull(pApi);
+    google::InstallFailureSignalHandler();
+
+    CHECK_NOTNULL(db);
+    CHECK_NOTNULL(pzErrMsg);
+    CHECK_NOTNULL(pApi);
 
     // Initialize the global sqlite3_api variable.
     //  so all sqlite3_*() functions can be used.
     SQLITE_EXTENSION_INIT2(pApi)
 
-    LOG("HEAD commit: %s", BUILD_HEAD_COMMIT);
-    LOG("Built by %s at %s", BUILD_USER, BUILD_TIMESTAMP);
-    LOG("SQLite3 compile-time version: %s", SQLITE_VERSION);
-    LOG("SQLite3 run-time version: %s", sqlite3_libversion());
+    LOG(INFO) << "HEAD commit: " << BUILD_HEAD_COMMIT;
+    LOG(INFO) << "Built by " << BUILD_USER << " at " << BUILD_TIMESTAMP;
+    LOG(INFO) << "SQLite3 compile-time version: " << SQLITE_VERSION;
+    LOG(INFO) << "SQLite3 run-time version: " << sqlite3_libversion();
 
     fts5_api *pFts5Api = fts5_api_from_db(db);
-    if (pFts5Api == NULL) {
+    if (pFts5Api == nullptr) {
         int err = sqlite3_errcode(db);
-        assert_nonzero(err, %d);
+        CHECK_NE(err, 0);
         *pzErrMsg = sqlite3_mprintf("%s: %d %s", __func__, err, sqlite3_errstr(err));
         return err;
     }
-    assert_eq(pFts5Api->iVersion, 2, %d);
+    CHECK_EQ(pFts5Api->iVersion, 2);
 
     fts5_tokenizer t = {
             .xCreate = ngram_create,
             .xDelete = ngram_delete,
             .xTokenize = ngram_tokenize,
     };
-    return pFts5Api->xCreateTokenizer(pFts5Api, LIBNAME, (void *) pFts5Api, &t, NULL);
+    return pFts5Api->xCreateTokenizer(pFts5Api, LIBNAME, (void *) pFts5Api, &t, nullptr);
 }
