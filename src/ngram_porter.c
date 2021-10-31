@@ -7,7 +7,6 @@
 
 #include <string.h>
 #include <ctype.h>
-#include <stdbool.h>
 
 #include "sqlite/sqlite3ext.h"      /* Do not use <sqlite3.h>! */
 
