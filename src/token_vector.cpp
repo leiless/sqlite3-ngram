@@ -39,7 +39,6 @@ token_vector::token_vector(const char *pText, int nText) {
     this->nText = nText;
 }
 
-
 bool token_vector::tokenize() {
     int iStart = 0;
     int iEnd = 0;

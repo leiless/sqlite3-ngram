@@ -180,7 +180,8 @@ static int ngram_tokenize(
         return SQLITE_ERROR;
     }
     for (const token &t: tv.get_tokens()) {
-        DLOG(INFO) << "> s = '" << t.get_str() << "' i = " << t.get_iStart() << " j = " << t.get_iEnd();
+        DLOG(INFO) << "> s = '" << t.get_str() << "' i = " << t.get_iStart() << " j = " << t.get_iEnd()
+                   << " category = " << t.get_category();
     }
 
     return SQLITE_OK;
