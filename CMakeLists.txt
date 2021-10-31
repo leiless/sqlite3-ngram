@@ -34,8 +34,8 @@ add_compile_definitions(BUILD_USER="${BUILD_USER}")
 find_package(glog 0.6.0 REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
-        src/ngram_porter.cc
-        src/utils.cc
+        src/ngram_porter.cpp
+        src/utils.cpp
         )
 
 target_link_libraries(${PROJECT_NAME} glog::glog)
