@@ -11,6 +11,7 @@ cmake_install.cmake
 Testing/
 *.cbp
 build/
+deps/
 
 *.zip
 *.so
