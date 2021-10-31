@@ -7,6 +7,7 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #include "sqlite/sqlite3ext.h"      /* Do not use <sqlite3.h>! */
 
@@ -204,9 +205,11 @@ static int ngram_tokenize(
     while (iEnd < nText) {
         u32 gram = 0;
         int iStartNext = 0;
+        token_category_t prev_category = SPACE_OR_CONTROL;
+        token_category_t category;
 
         while (gram < tok->ngram && iEnd < nText) {
-            token_category_t category = get_token_category(pText[iEnd]);
+            category = get_token_category(pText[iEnd]);
             int iEndPrev = iEnd;
 
             if (category == OTHER) {
@@ -224,27 +227,42 @@ static int ngram_tokenize(
 
             if (category != SPACE_OR_CONTROL) {
                 gram++;
-                if (gram == 2) {
+                if (gram == 1) {
+                    if (category != OTHER) {
+                        // Index one-gram for alphanum
+                        break;
+                    }
+                } else if (gram == 2) {
                     assert_eq(iStartNext, 0, %d);
                     iStartNext = iEndPrev;
                 }
             }
+
+            // 你好
+            // Hello World
+            // 是|Jack>
+            // Jack|是>
+            if (prev_category != SPACE_OR_CONTROL && category != SPACE_OR_CONTROL && prev_category != category) {
+                iEnd = iEndPrev;
+                break;
+            }
+            if (category != SPACE_OR_CONTROL) {
+                prev_category = category;
+            }
         }
 
-        if (gram == tok->ngram) {
+        // Full ngram or ASCII-only term
+        if (gram == tok->ngram || (gram != 0 && category != OTHER)) {
             const char *token = &pText[iStart];
             int tokenLen = iEnd - iStart;
 
             nthToken++;
-            LOG_DBG("Token#%d: len: %d str: %.*s", nthToken, tokenLen, tokenLen, token);
+            LOG_DBG("Token#%d: len: %d str: '%.*s'", nthToken, tokenLen, tokenLen, token);
 
             int rc = xToken(pCtx, 0, token, tokenLen, iStart, iEnd);
             if (rc != SQLITE_OK) {
                 return rc;
             }
-        } else {
-            // Cannot fulfill ngram, meaning we're done
-            break;
         }
 
         if (iStartNext != 0) {
