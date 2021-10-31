@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
 project(ngram_porter)
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 11)
 
 add_compile_options(-Wall -Wextra -g -DDEBUG -O0)
 #add_compile_options(-Wall -Wextra -O2 -DASSERTF_DISABLE)
@@ -30,6 +30,6 @@ execute_process(
 add_compile_definitions(BUILD_USER="${BUILD_USER}")
 
 add_library(${PROJECT_NAME} SHARED
-        src/ngram_porter.c
-        src/utils.c
+        src/ngram_porter.cc
+        src/utils.cc
         )

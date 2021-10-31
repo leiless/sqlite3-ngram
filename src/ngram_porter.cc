@@ -83,7 +83,7 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
     fts5_api *pFts5Api = (fts5_api *) pCtx;
     UNUSED(pFts5Api);
 
-    ngram_tokenizer_t *tok = sqlite3_malloc(sizeof(*tok));
+    auto *tok = (ngram_tokenizer_t *) sqlite3_malloc(sizeof(ngram_tokenizer_t));
     if (tok == NULL) {
         LOG_ERR("sqlite3_malloc() fail, size: %zu", sizeof(*tok));
         return SQLITE_NOMEM;
