@@ -5,7 +5,7 @@
 
 class token {
 public:
-    token(const char *, int, int);
+    token(std::string, int, int);
 
     const std::string &get_str() const;
 
@@ -15,8 +15,8 @@ public:
 
 private:
     std::string str;
-    int iStart;
-    int iEnd;
+    int iStart; // Inclusive
+    int iEnd; // Exclusive
 };
 
 class token_vector {

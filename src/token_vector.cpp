@@ -3,9 +3,14 @@
 #include <cctype>
 #include <glog/logging.h>
 #include <iostream>
+#include <utility>
 
-token::token(const char *str, int iStart, int iEnd) {
-    this->str = str;
+token::token(std::string str, int iStart, int iEnd) {
+    CHECK_GE(iStart, 0);
+    CHECK_GE(iEnd, 0);
+    CHECK_LT(iStart, iEnd);
+
+    this->str = std::move(str);
     this->iStart = iStart;
     this->iEnd = iEnd;
 }
@@ -55,7 +60,7 @@ bool token_vector::tokenize() {
 
             // Will properly null-terminate the resulting std::string
             std::string s(pText + iStart, iEnd - iStart);
-            DLOG(INFO) << "> n = " << (iEnd - iStart) << " s = '" << s << "'";
+            tokens.emplace_back(s, iStart, iEnd);
         }
 
         iStart = iEnd;
