@@ -194,7 +194,6 @@ static int ngram_tokenize(
         for (int j = 0; j < tok->ngram; j++) {
             // Avoid out of array boundary
             if (i + j >= tokens.size()) {
-#if 1
                 if (tokens.size() >= (size_t) tok->ngram) {
                     bool same_category = true;
 
@@ -215,15 +214,7 @@ static int ngram_tokenize(
                         arr.clear();
                     }
                 }
-#else
-                if (tokens.size() >= 2) {
-                    prev_category = tokens[tokens.size() - 2].get_category();
-                    token_category_t category = tokens[tokens.size() - 1].get_category();
-                    if (prev_category == category) {
-                        arr.clear();
-                    }
-                }
-#endif
+
                 break;
             }
 
