@@ -4,7 +4,7 @@ project(ngram)
 set(CMAKE_CXX_STANDARD 11)
 
 add_compile_options(-Wall -Wextra -g -DDEBUG -O0)
-#add_compile_options(-Wall -Wextra -O2 -DASSERTF_DISABLE)
+#add_compile_options(-Wall -Wextra -O2)
 
 # TODO: Stringify CMAKE_CXX_FLAGS
 
@@ -30,7 +30,6 @@ execute_process(
 add_compile_definitions(BUILD_USER="${BUILD_USER}")
 
 # see: https://github.com/google/glog#incorporating-glog-into-a-cmake-project
-#add_subdirectory(deps/glog)
 find_package(glog 0.6.0 REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
