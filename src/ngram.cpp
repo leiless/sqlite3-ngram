@@ -200,6 +200,7 @@ static int ngram_tokenize(
     const std::vector<token> &tokens = tv.get_tokens();
 
     for (size_t i = 0; i < tokens.size(); i++) {
+        const token *aux_token = nullptr;
         std::vector<token> arr;
 
         token_category_t prev_category;
@@ -241,10 +242,32 @@ static int ngram_tokenize(
                 if (curr_token.get_category() != prev_category) {
                     break;
                 }
+            } else if ((ssize_t) i + j - 1 >= 0 && i + j + 1 < tokens.size()) {
+                // Hint: j can be simply removed in this if-branch (since j = 0)
+
+                token_category_t l = tokens[i + j - 1].get_category();
+                token_category_t m = curr_token.get_category();
+                token_category_t r = tokens[i + j + 1].get_category();
+
+                if (l != OTHER && m == OTHER && r == OTHER) {
+                    CHECK_EQ(aux_token, nullptr);
+                    aux_token = &curr_token;
+                }
             }
 
             arr.emplace_back(curr_token);
             prev_category = curr_token.get_category();
+        }
+
+        if (aux_token != nullptr) {
+            const std::string &s = aux_token->get_str();
+            int iStart = aux_token->get_iStart();
+            int iEnd = aux_token->get_iEnd();
+            CHECK_LT(iStart, iEnd);
+            DLOG(INFO) << ">    aux token = '" << s << "'"
+                       << " iStart = " << iStart
+                       << " iEnd = " << iEnd;
+            xToken(pCtx, 0, s.c_str(), (int) s.length(), iStart, iEnd);
         }
 
         if (!arr.empty()) {
