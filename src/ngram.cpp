@@ -288,7 +288,7 @@ __declspec(dllexport)
 extern "C"
 #endif
 UNUSED_ATTR
-int sqlite3_ngramporter_init(
+int sqlite3_ngram_init(
         sqlite3 *db,
         char **pzErrMsg,
         const sqlite3_api_routines *pApi) {

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(ngram_porter)
+project(ngram)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -34,7 +34,7 @@ add_compile_definitions(BUILD_USER="${BUILD_USER}")
 find_package(glog 0.6.0 REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
-        src/ngram_porter.cpp
+        src/ngram.cpp
         src/utils.cpp
         src/token_vector.cpp
         )
