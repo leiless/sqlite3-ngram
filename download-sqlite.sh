@@ -14,7 +14,7 @@ DIR="$(basename "$FILE" .zip)"
 echo "Version: $DIR"
 
 ZIP_URL=$URL/$URI
-wget "$ZIP_URL" -O "$FILE"
+curl "$ZIP_URL" -o "$FILE"
 
 rm -rf sqlite-amalgamation-*/
 
