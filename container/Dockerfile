@@ -3,7 +3,7 @@ FROM ubuntu
 ARG DEBIAN_FRONTEND=noninteractive
 
 # https://stackoverflow.com/questions/24648357/compiling-a-static-executable-with-cmake
-RUN set -eufx && \
+RUN set -eux && \
     apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates git curl unzip cmake g++ make && \
     git clone --depth=1 https://github.com/google/glog.git && \

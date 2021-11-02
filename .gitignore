@@ -13,6 +13,8 @@ Testing/
 build/
 deps/
 
+*.swp
+*.swo
 *.zip
 *.so
 *.dylib
