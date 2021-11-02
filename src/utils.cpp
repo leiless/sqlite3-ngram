@@ -43,7 +43,7 @@ int parse_int(const char *str, char delim, int base, int *val) {
 // Taken from https://github.com/apple/darwin-xnu/blob/main/bsd/vfs/vfs_utfconv.c#L662
 //  with modification
 
-static char utf_extrabytes[32] = {
+static int utf_extrabytes[32] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 2, 2, 3, -1
 };
