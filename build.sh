@@ -9,9 +9,6 @@ if [ ! -L src/sqlite ]; then
     ./download-sqlite.sh
 fi
 
-mkdir -p build
-pushd build > /dev/null
-    cmake ..
-    make clean all
-popd > /dev/null
+cmake -S . -B build
+cmake --build build
 
