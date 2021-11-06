@@ -10,6 +10,7 @@ RUN set -eux && \
     cd glog && \
     cmake -S . -B build -G "Unix Makefiles" -DBUILD_SHARED_LIBS=OFF && \
     cmake --build build --target install && \
+    mv build/lib/cmake/glog/glog-modules.cmake /usr/local/lib/cmake/glog && \
     cd .. && \
     rm -rf glog && \
     rm -rf /var/lib/apt/lists/*
