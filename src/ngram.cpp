@@ -99,7 +99,7 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
             }
 
             int gram;
-            if (!parse_int(azArg[i], '\0', 10, &gram)) {
+            if (!ngram_tokenizer::parse_int(azArg[i], '\0', 10, &gram)) {
                 LOG(ERROR) << "parse_int() fail, str: " << azArg[i];
                 goto out_fail;
             }
@@ -210,7 +210,7 @@ static int ngram_tokenize(
     DLOG(INFO) << "nText: " << nText << " pText: " << std::string(pText, 0, nText);
     DLOG(INFO) << "xToken: " << xToken;
 
-    if (utf8_validatestr(reinterpret_cast<const u_int8_t *>(pText), nText) != 0) {
+    if (ngram_tokenizer::utf8_validatestr(reinterpret_cast<const u_int8_t *>(pText), nText) != 0) {
         LOG(ERROR) << "Met invalid UTF-8 character(s) in the input text, please check the text or issue a bug report";
         return SQLITE_ERROR;
     }
