@@ -3,10 +3,13 @@ project(ngram)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_compile_options(-Wall -Wextra -g -DDEBUG -O0)
-#add_compile_options(-Wall -Wextra -O2)
-
 # TODO: Stringify CMAKE_CXX_FLAGS
+message("CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_options(-Wall -Wextra -g -DDEBUG -O0)
+else ()
+    add_compile_options(-Wall -Wextra -O2)
+endif ()
 
 execute_process(
         COMMAND git describe --dirty --always --abbrev=7

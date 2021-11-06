@@ -9,7 +9,7 @@ if [ ! -L src/sqlite ]; then
     ./download-sqlite.sh
 fi
 
-cmake -S . -B build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build --target clean
 cmake --build build
 
