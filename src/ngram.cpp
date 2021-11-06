@@ -151,7 +151,7 @@ typedef int (*xTokenCallback)(
 );
 
 static inline void do_tokenize(
-        const std::vector<Token> &arr,
+        const std::vector<ngram_tokenizer::Token> &arr,
         size_t last_index,
         xTokenCallback xToken,
         ngram_tokenizer_t *tok,
@@ -215,24 +215,24 @@ static int ngram_tokenize(
         return SQLITE_ERROR;
     }
 
-    TokenVector tv = TokenVector(pText, nText);
+    auto tv = ngram_tokenizer::TokenVector(pText, nText);
     if (!tv.tokenize()) {
         return SQLITE_ERROR;
     }
-    for (const Token &t: tv.get_tokens()) {
+    for (const auto &t: tv.get_tokens()) {
         DLOG(INFO) << "> token = '" << t.get_str()
                    << "' iStart = " << t.get_iStart()
                    << " iEnd = " << t.get_iEnd()
                    << " category = " << t.get_category();
     }
 
-    const std::vector<Token> &tokens = tv.get_tokens();
+    const std::vector<ngram_tokenizer::Token> &tokens = tv.get_tokens();
 
-    std::vector<Token> prevArr;
+    std::vector<ngram_tokenizer::Token> prevArr;
     for (size_t i = 0; i < tokens.size(); i++) {
-        std::vector<Token> arr;
+        std::vector<ngram_tokenizer::Token> arr;
 
-        token_category_t prev_category;
+        ngram_tokenizer::token_category_t prev_category;
         for (int j = 0; j < tok->ngram; j++) {
             // Avoid out of array boundary
             if (i + j >= tokens.size()) {
@@ -240,7 +240,7 @@ static int ngram_tokenize(
                     bool same_category = true;
 
                     for (int k = 0; k < tok->ngram; k++) {
-                        token_category_t category = tokens[tokens.size() - k - 1].get_category();
+                        ngram_tokenizer::token_category_t category = tokens[tokens.size() - k - 1].get_category();
                         if (k != 0) {
                             if (category != prev_category) {
                                 same_category = false;
@@ -262,10 +262,10 @@ static int ngram_tokenize(
                 break;
             }
 
-            const Token &curr_token = tokens[i + j];
+            const auto &curr_token = tokens[i + j];
 
             if (j != 0) {
-                if (curr_token.get_category() != OTHER) {
+                if (curr_token.get_category() != ngram_tokenizer::OTHER) {
                     break;
                 }
                 if (curr_token.get_category() != prev_category) {
@@ -279,7 +279,8 @@ static int ngram_tokenize(
 
         if (!arr.empty()) {
             // Temporarily solution to the input text case 'Hello世界'
-            if (prevArr.size() == 1 && prevArr[0].get_category() != OTHER && arr[0].get_category() == OTHER) {
+            if (prevArr.size() == 1 && prevArr[0].get_category() != ngram_tokenizer::OTHER &&
+                arr[0].get_category() == ngram_tokenizer::OTHER) {
                 for (size_t u = 0; u + 1 < arr.size(); u++) {
                     DLOG(INFO) << "--- " << (u + 1);
                     for (size_t v = 0; v <= u; v++) {
