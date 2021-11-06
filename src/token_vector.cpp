@@ -77,7 +77,7 @@ namespace ngram_tokenizer {
         return true;
     }
 
-// Call only after a successful call of tokenize()
+    // Call only after a successful call of tokenize()
     const std::vector<Token> &TokenVector::get_tokens() const {
         CHECK(ok) << "Make sure tokenize() has been successfully called";
         return tokens;
@@ -99,18 +99,18 @@ namespace ngram_tokenizer {
         return OTHER;
     }
 
-/**
- * Count how many bytes an UTF-8 character occupied
- *
- * @c       The UTF8 character starting code point
- * @return  0 if it's not a valid UTF-8 character
- *
- * see:
- *  https://en.wikipedia.org/wiki/UTF-8#Encoding
- *  https://stackoverflow.com/questions/64846096/utf-8-character-count/64846299#64846299
- *  https://xr.anadoxin.org/source/xref/macos-10.14.1-mojave/xnu-4903.221.2/bsd/vfs/vfs_utfconv.c#639
- *  https://github.com/apple/darwin-xnu/blob/main/bsd/vfs/vfs_utfconv.c#L662
- */
+    /**
+     * Count how many bytes an UTF-8 character occupied
+     *
+     * @c       The UTF8 character starting code point
+     * @return  0 if it's not a valid UTF-8 character
+     *
+     * see:
+     *  https://en.wikipedia.org/wiki/UTF-8#Encoding
+     *  https://stackoverflow.com/questions/64846096/utf-8-character-count/64846299#64846299
+     *  https://xr.anadoxin.org/source/xref/macos-10.14.1-mojave/xnu-4903.221.2/bsd/vfs/vfs_utfconv.c#639
+     *  https://github.com/apple/darwin-xnu/blob/main/bsd/vfs/vfs_utfconv.c#L662
+     */
     int TokenVector::utf8_char_count(char c) {
         int n = 0;
         while ((c & 0x80) && n < 4) {
