@@ -150,6 +150,35 @@ typedef int (*xTokenCallback)(
         int iEnd            /* Byte offset of end of token within input text */
 );
 
+static void do_tokenize(
+        const std::vector<token> &arr,
+        size_t last_index,
+        xTokenCallback xToken,
+        ngram_tokenizer_t *tok,
+        void *pCtx) {
+    static size_t first_index = 0;
+
+    int iStart = arr[first_index].get_iStart();
+    int iEnd = arr[last_index].get_iEnd();
+    CHECK_LT(iStart, iEnd);
+
+    std::stringstream ss;
+    for (size_t i = first_index; i <= last_index; i++) {
+        ss << arr[i].get_str();
+    }
+    std::string s = ss.str();
+
+    if (!tok->case_sensitive) {
+        // https://stackoverflow.com/questions/313970/how-to-convert-an-instance-of-stdstring-to-lower-case/313990#313990
+        std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    }
+
+    DLOG(INFO) << "> result token = '" << s << "'"
+               << " iStart = " << iStart
+               << " iEnd = " << iEnd;
+    xToken(pCtx, 0, s.c_str(), (int) s.length(), iStart, iEnd);
+}
+
 /**
  * [qt.]
  * If an xToken() callback returns any value other than SQLITE_OK,
@@ -199,6 +228,7 @@ static int ngram_tokenize(
 
     const std::vector<token> &tokens = tv.get_tokens();
 
+    std::vector<token> prevArr;
     for (size_t i = 0; i < tokens.size(); i++) {
         std::vector<token> arr;
 
@@ -248,6 +278,16 @@ static int ngram_tokenize(
         }
 
         if (!arr.empty()) {
+            // Temporarily solution to the input text case 'Hello世界'
+            if (prevArr.size() == 1 && prevArr[0].get_category() != OTHER && arr[0].get_category() == OTHER) {
+                for (size_t u = 0; u + 1 < arr.size(); u++) {
+                    DLOG(INFO) << "--- " << (u + 1);
+                    for (size_t v = 0; v <= u; v++) {
+                        do_tokenize(arr, v, xToken, tok, pCtx);
+                    }
+                }
+            }
+
             int iStart = arr[0].get_iStart();
             int iEnd = arr[arr.size() - 1].get_iEnd();
             CHECK_LT(iStart, iEnd);
@@ -264,6 +304,8 @@ static int ngram_tokenize(
                        << " iStart = " << iStart
                        << " iEnd = " << iEnd;
             xToken(pCtx, 0, s.c_str(), (int) s.length(), iStart, iEnd);
+
+            prevArr = std::move(arr);
         }
     }
 
