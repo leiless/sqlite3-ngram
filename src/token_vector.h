@@ -11,9 +11,9 @@ typedef enum {
     OTHER
 } token_category_t;
 
-class token {
+class Token {
 public:
-    token(std::string, int, int, token_category_t);
+    Token(std::string, int, int, token_category_t);
 
     const std::string &get_str() const;
 
@@ -30,13 +30,13 @@ private:
     token_category_t category;
 };
 
-class token_vector {
+class TokenVector {
 public:
-    token_vector(const char *, int);
+    TokenVector(const char *, int);
 
     bool tokenize();
 
-    const std::vector<token> &get_tokens() const;
+    const std::vector<Token> &get_tokens() const;
 
 private:
     static token_category_t token_category(char);
@@ -45,6 +45,6 @@ private:
 
     const char *pText;
     int nText;
-    std::vector<token> tokens;
+    std::vector<Token> tokens;
     bool ok;
 };

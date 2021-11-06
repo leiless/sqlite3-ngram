@@ -151,7 +151,7 @@ typedef int (*xTokenCallback)(
 );
 
 static inline void do_tokenize(
-        const std::vector<token> &arr,
+        const std::vector<Token> &arr,
         size_t last_index,
         xTokenCallback xToken,
         ngram_tokenizer_t *tok,
@@ -215,22 +215,22 @@ static int ngram_tokenize(
         return SQLITE_ERROR;
     }
 
-    token_vector tv = token_vector(pText, nText);
+    TokenVector tv = TokenVector(pText, nText);
     if (!tv.tokenize()) {
         return SQLITE_ERROR;
     }
-    for (const token &t: tv.get_tokens()) {
+    for (const Token &t: tv.get_tokens()) {
         DLOG(INFO) << "> token = '" << t.get_str()
                    << "' iStart = " << t.get_iStart()
                    << " iEnd = " << t.get_iEnd()
                    << " category = " << t.get_category();
     }
 
-    const std::vector<token> &tokens = tv.get_tokens();
+    const std::vector<Token> &tokens = tv.get_tokens();
 
-    std::vector<token> prevArr;
+    std::vector<Token> prevArr;
     for (size_t i = 0; i < tokens.size(); i++) {
-        std::vector<token> arr;
+        std::vector<Token> arr;
 
         token_category_t prev_category;
         for (int j = 0; j < tok->ngram; j++) {
@@ -262,7 +262,7 @@ static int ngram_tokenize(
                 break;
             }
 
-            const token &curr_token = tokens[i + j];
+            const Token &curr_token = tokens[i + j];
 
             if (j != 0) {
                 if (curr_token.get_category() != OTHER) {

@@ -5,7 +5,7 @@
 #include <iostream>
 #include <utility>
 
-token::token(std::string str, int iStart, int iEnd, token_category_t category) {
+Token::Token(std::string str, int iStart, int iEnd, token_category_t category) {
     CHECK_GE(iStart, 0);
     CHECK_GE(iEnd, 0);
     CHECK_LT(iStart, iEnd);
@@ -16,23 +16,23 @@ token::token(std::string str, int iStart, int iEnd, token_category_t category) {
     this->category = category;
 }
 
-const std::string &token::get_str() const {
+const std::string &Token::get_str() const {
     return str;
 }
 
-int token::get_iStart() const {
+int Token::get_iStart() const {
     return iStart;
 }
 
-int token::get_iEnd() const {
+int Token::get_iEnd() const {
     return iEnd;
 }
 
-token_category_t token::get_category() const {
+token_category_t Token::get_category() const {
     return category;
 }
 
-token_vector::token_vector(const char *pText, int nText) {
+TokenVector::TokenVector(const char *pText, int nText) {
     CHECK_NOTNULL(pText);
     CHECK_GE(nText, 0);
     this->pText = pText;
@@ -40,7 +40,7 @@ token_vector::token_vector(const char *pText, int nText) {
     this->ok = false;
 }
 
-bool token_vector::tokenize() {
+bool TokenVector::tokenize() {
     int iStart = 0;
     int iEnd = 0;
 
@@ -77,12 +77,12 @@ bool token_vector::tokenize() {
 }
 
 // Call only after a successful call of tokenize()
-const std::vector<token> &token_vector::get_tokens() const {
+const std::vector<Token> &TokenVector::get_tokens() const {
     CHECK(ok) << "Make sure tokenize() has been successfully called";
     return tokens;
 }
 
-token_category_t token_vector::token_category(char c) {
+token_category_t TokenVector::token_category(char c) {
     if (isdigit(c)) {
         return DIGIT;
     }
@@ -110,7 +110,7 @@ token_category_t token_vector::token_category(char c) {
  *  https://xr.anadoxin.org/source/xref/macos-10.14.1-mojave/xnu-4903.221.2/bsd/vfs/vfs_utfconv.c#639
  *  https://github.com/apple/darwin-xnu/blob/main/bsd/vfs/vfs_utfconv.c#L662
  */
-int token_vector::utf8_char_count(char c) {
+int TokenVector::utf8_char_count(char c) {
     int n = 0;
     while ((c & 0x80) && n < 4) {
         n++;
