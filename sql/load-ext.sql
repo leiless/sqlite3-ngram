@@ -18,3 +18,6 @@ SELECT * FROM t1('Linux上如');
 SELECT * FROM t1('微信');
 SELECT * FROM t1('🤣🎃');
 
+SELECT highlight(t1, 0, '[', ']') FROM t1('linux上');
+SELECT highlight(t1, 0, '[', ']') FROM t1('ubuntu linux上');
+
