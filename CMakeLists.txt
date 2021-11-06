@@ -32,10 +32,11 @@ add_compile_definitions(BUILD_USER="${BUILD_USER}")
 # see: https://github.com/google/glog#incorporating-glog-into-a-cmake-project
 find_package(glog 0.6.0 REQUIRED)
 
-add_library(${PROJECT_NAME} SHARED
+add_library(
+        ${PROJECT_NAME} SHARED
         src/ngram.cpp
         src/utils.cpp
         src/token_vector.cpp
-        )
+)
 
 target_link_libraries(${PROJECT_NAME} glog::glog)
