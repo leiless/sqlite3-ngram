@@ -29,7 +29,7 @@ SQLITE_EXTENSION_INIT1
  *  https://pspdfkit.com/blog/2018/leveraging-sqlite-full-text-search-on-ios/
  *  https://archive.is/wip/B6gDa
  */
-static fts5_api *fts5_api_from_db(sqlite3 *db) {
+static inline fts5_api *fts5_api_from_db(sqlite3 *db) {
     CHECK_NOTNULL(db);
 
     fts5_api *pFts5Api = nullptr;
@@ -150,7 +150,7 @@ typedef int (*xTokenCallback)(
         int iEnd            /* Byte offset of end of token within input text */
 );
 
-static void do_tokenize(
+static inline void do_tokenize(
         const std::vector<token> &arr,
         size_t last_index,
         xTokenCallback xToken,
@@ -288,22 +288,7 @@ static int ngram_tokenize(
                 }
             }
 
-            int iStart = arr[0].get_iStart();
-            int iEnd = arr[arr.size() - 1].get_iEnd();
-            CHECK_LT(iStart, iEnd);
-            std::stringstream ss;
-            for (const token &t: arr) {
-                ss << t.get_str();
-            }
-            std::string s = ss.str();
-            if (!tok->case_sensitive) {
-                // https://stackoverflow.com/questions/313970/how-to-convert-an-instance-of-stdstring-to-lower-case/313990#313990
-                std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-            }
-            DLOG(INFO) << "> result token = '" << s << "'"
-                       << " iStart = " << iStart
-                       << " iEnd = " << iEnd;
-            xToken(pCtx, 0, s.c_str(), (int) s.length(), iStart, iEnd);
+            do_tokenize(arr, arr.size() - 1, xToken, tok, pCtx);
 
             prevArr = std::move(arr);
         }
