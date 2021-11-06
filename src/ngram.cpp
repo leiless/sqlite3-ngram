@@ -71,7 +71,7 @@ typedef struct {
  *  If an error occurs, some value other than SQLITE_OK should be returned.
  *  In this case, fts5 assumes that the final value of *ppOut is undefined.
  */
-static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer **ppOut) {
+static int ngram_cb_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer **ppOut) {
     DLOG(INFO) << "Creating FTS5 ngram tokenizer ...";
     DLOG(INFO) << "pCtx: " << pCtx << " azArg: " << azArg << " nArg: " << nArg << " ppOut: " << ppOut;
 
@@ -131,7 +131,7 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
  * This function is invoked to delete a tokenizer handle previously allocated using xCreate().
  * Fts5 guarantees that this function will be invoked exactly once for each successful call to xCreate().
  */
-static void ngram_delete(Fts5Tokenizer *pTok) {
+static void ngram_cb_delete(Fts5Tokenizer *pTok) {
     DLOG(INFO) << "Freeing FTS5 " LIBNAME " tokenizer...";
 
     CHECK_NOTNULL(pTok);
@@ -187,7 +187,7 @@ static inline void do_tokenize(
  *  if an error occurs with the xTokenize() implementation itself,
  *  it may abandon the tokenization and return any error code other than SQLITE_OK or SQLITE_DONE.
  */
-static int ngram_tokenize(
+static int ngram_cb_tokenize(
         Fts5Tokenizer *pTok,
         void *pCtx,
         int flags,          /* Mask of FTS5_TOKENIZE_* flags */
@@ -299,9 +299,9 @@ static int ngram_tokenize(
 }
 
 static fts5_tokenizer token_handle = {
-        .xCreate = ngram_create,
-        .xDelete = ngram_delete,
-        .xTokenize = ngram_tokenize,
+        .xCreate = ngram_cb_create,
+        .xDelete = ngram_cb_delete,
+        .xTokenize = ngram_cb_tokenize,
 };
 
 /**
