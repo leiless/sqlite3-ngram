@@ -10,5 +10,6 @@ if [ ! -L src/sqlite ]; then
 fi
 
 cmake -S . -B build
+cmake --build build --target clean
 cmake --build build
 
