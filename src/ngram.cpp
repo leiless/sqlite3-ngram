@@ -62,7 +62,7 @@ static inline fts5_api *fts5_api_from_db(sqlite3 *db) {
 typedef struct {
     int ngram;
     bool case_sensitive;
-} ngram_tokenizer_t;
+} ngram_context_t;
 
 /**
  * [qt.]
@@ -83,14 +83,14 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
     auto *pFts5Api = (fts5_api *) pCtx;
     UNUSED(pFts5Api);
 
-    auto *tok = (ngram_tokenizer_t *) sqlite3_malloc(sizeof(ngram_tokenizer_t));
-    if (tok == nullptr) {
-        LOG(ERROR) << "sqlite3_malloc() fail, size: " << sizeof(*tok);
+    auto *ctx = (ngram_context_t *) sqlite3_malloc(sizeof(ngram_context_t));
+    if (ctx == nullptr) {
+        LOG(ERROR) << "sqlite3_malloc() fail, size: " << sizeof(*ctx);
         return SQLITE_NOMEM;
     }
-    (void) memset(tok, 0, sizeof(*tok));
+    (void) memset(ctx, 0, sizeof(*ctx));
 
-    tok->ngram = DEFAULT_GRAM;
+    ctx->ngram = DEFAULT_GRAM;
     for (int i = 0; i < nArg; i++) {
         if (!strcmp(azArg[i], "gram")) {
             if (++i >= nArg) {
@@ -107,22 +107,22 @@ static int ngram_create(void *pCtx, const char **azArg, int nArg, Fts5Tokenizer 
                 LOG(ERROR) << gram << "-gram is out of range, should in range [" << MIN_GRAM << ", " << MAX_GRAM << "]";
                 goto out_fail;
             }
-            tok->ngram = gram;
+            ctx->ngram = gram;
         } else if (!strcmp(azArg[i], "case_sensitive")) {
-            tok->case_sensitive = true;
+            ctx->case_sensitive = true;
         } else {
             LOG(ERROR) << "unrecognizable option at index " << i << ": " << azArg[i];
             goto out_fail;
         }
     }
 
-    DLOG(INFO) << "ngram = " << tok->ngram;
-    DLOG(INFO) << "case_sensitive = " << tok->case_sensitive;
-    *ppOut = (Fts5Tokenizer *) tok;
+    DLOG(INFO) << "ngram = " << ctx->ngram;
+    DLOG(INFO) << "case_sensitive = " << ctx->case_sensitive;
+    *ppOut = (Fts5Tokenizer *) ctx;
     return SQLITE_OK;
 
     out_fail:
-    sqlite3_free(tok);
+    sqlite3_free(ctx);
     return SQLITE_ERROR;
 }
 
@@ -135,10 +135,10 @@ static void ngram_delete(Fts5Tokenizer *pTok) {
     DLOG(INFO) << "Freeing FTS5 " LIBNAME " tokenizer...";
 
     CHECK_NOTNULL(pTok);
-    auto *tok = (ngram_tokenizer_t *) pTok;
-    DLOG(INFO) << "pTok: " << tok << " ngram: " << tok->ngram;
+    auto *ctx = (ngram_context_t *) pTok;
+    DLOG(INFO) << "pTok: " << ctx << " ngram: " << ctx->ngram;
 
-    sqlite3_free(tok);
+    sqlite3_free(ctx);
 }
 
 typedef int (*xTokenCallback)(
@@ -154,7 +154,7 @@ static inline void do_tokenize(
         const std::vector<ngram_tokenizer::Token> &arr,
         size_t last_index,
         xTokenCallback xToken,
-        ngram_tokenizer_t *tok,
+        ngram_context_t *ctx,
         void *pCtx) {
     static size_t first_index = 0;
 
@@ -168,7 +168,7 @@ static inline void do_tokenize(
     }
     std::string s = ss.str();
 
-    if (!tok->case_sensitive) {
+    if (!ctx->case_sensitive) {
         // https://stackoverflow.com/questions/313970/how-to-convert-an-instance-of-stdstring-to-lower-case/313990#313990
         std::transform(s.begin(), s.end(), s.begin(), ::tolower);
     }
@@ -203,8 +203,8 @@ static int ngram_tokenize(
     auto *pFts5Api = (fts5_api *) pCtx;
     UNUSED(pFts5Api);
 
-    auto *tok = (ngram_tokenizer_t *) pTok;
-    DLOG(INFO) << tok->ngram << "-gram tokenizing ...";
+    auto *ctx = (ngram_context_t *) pTok;
+    DLOG(INFO) << ctx->ngram << "-gram tokenizing ...";
     DLOG(INFO) << "pTok: " << pTok << " pCtx: " << pCtx << " flags: " << flags;
     // [quote] ... pText may or may not be nul-terminated.
     DLOG(INFO) << "nText: " << nText << " pText: " << std::string(pText, 0, nText);
@@ -233,13 +233,13 @@ static int ngram_tokenize(
         std::vector<ngram_tokenizer::Token> arr;
 
         ngram_tokenizer::token_category_t prev_category;
-        for (int j = 0; j < tok->ngram; j++) {
+        for (int j = 0; j < ctx->ngram; j++) {
             // Avoid out of array boundary
             if (i + j >= tokens.size()) {
-                if (tokens.size() >= (size_t) tok->ngram) {
+                if (tokens.size() >= (size_t) ctx->ngram) {
                     bool same_category = true;
 
-                    for (int k = 0; k < tok->ngram; k++) {
+                    for (int k = 0; k < ctx->ngram; k++) {
                         ngram_tokenizer::token_category_t category = tokens[tokens.size() - k - 1].get_category();
                         if (k != 0) {
                             if (category != prev_category) {
@@ -284,12 +284,12 @@ static int ngram_tokenize(
                 for (size_t u = 0; u + 1 < arr.size(); u++) {
                     DLOG(INFO) << "--- " << (u + 1);
                     for (size_t v = 0; v <= u; v++) {
-                        do_tokenize(arr, v, xToken, tok, pCtx);
+                        do_tokenize(arr, v, xToken, ctx, pCtx);
                     }
                 }
             }
 
-            do_tokenize(arr, arr.size() - 1, xToken, tok, pCtx);
+            do_tokenize(arr, arr.size() - 1, xToken, ctx, pCtx);
 
             prevArr = std::move(arr);
         }
