@@ -10,7 +10,7 @@ For the input text `Hello 新 世界`:
 
 - `ngram = 2`
 
-  `Hello`, `新世`, `世界`
+  `Hello`, `新`, `新世`, `世界`
 
 - `ngram = 3`
 
