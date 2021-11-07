@@ -14,7 +14,7 @@ For the input text `Hello 新 世界`:
 
 - `ngram = 3`
 
-  `Hello`, `新世界`
+  `Hello`, `新`, `新世`, `新世界`
 
 The tokenization is based on [UTF-8](https://en.wikipedia.org/wiki/UTF-8#Encoding) character and character category boundary.
 
