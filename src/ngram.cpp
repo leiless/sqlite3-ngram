@@ -139,6 +139,10 @@ static void ngram_cb_delete(Fts5Tokenizer *pTok) {
     DLOG(INFO) << "pTok: " << ctx << " ngram: " << ctx->ngram;
 
     sqlite3_free(ctx);
+
+#ifndef DEBUG
+    google::ShutdownGoogleLogging();
+#endif
 }
 
 typedef int (*xTokenCallback)(
@@ -320,6 +324,10 @@ int sqlite3_ngram_init(
         sqlite3 *db,
         char **pzErrMsg,
         const sqlite3_api_routines *pApi) {
+#ifndef DEBUG
+    google::InitGoogleLogging(LIBNAME);
+#endif
+
     google::InstallFailureSignalHandler();
 
     CHECK_NOTNULL(db);
