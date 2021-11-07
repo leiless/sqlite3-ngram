@@ -16,7 +16,7 @@ For the input text `Hello 新 世界`:
 
   `Hello`, `新世界`
 
-The tokenization is based on [UTF-8](https://en.wikipedia.org/wiki/UTF-8#Encoding) character boundary.
+The tokenization is based on [UTF-8](https://en.wikipedia.org/wiki/UTF-8#Encoding) character and character category boundary.
 
 The ngram currently support is in range `[1, 4]`, larger ngram can be supported but it's usually unnecessary.
 
@@ -25,6 +25,7 @@ This tokenizer extension can be used as a fallback(generic) tokenizer for FTS pu
 ## Build
 
 ```bash
+# Tested under podman, docker should also be ok.
 container/build.sh
 ```
 
@@ -50,17 +51,17 @@ You can integrate this tokenizer with the SQLite3 official [`porter`](https://ww
 CREATE VIRTUAL TABLE t1 USING fts5(x, tokenize = 'porter ngram gram N');
 ```
 
-In such case, if you tokenized the word `direct`. `directed`, `directing`, `direction`, `directly`, etc. can all be coalesced into `direct` and thus hit a match.
+In such case, if you tokenized the word `direct`. `directed`, `directing`, `direction`, `directly`... all can be coalesced into `direct` and thus hit a match.
 
 ## Limitation
 
-Currently only the UTF-8 string is supported for tokenization.
+Currently only the UTF-8 string is supported for tokenization, usually not a big concern though.
 
 ## Credits
 
 This project was inspired from the following projects:
 
-- [wangfenjin/simple - 支持中文（简体和繁体）和拼音的 SQLite fts5 扩展](https://github.com/wangfenjin/simple)
+[wangfenjin/simple - 支持中文（简体和繁体）和拼音的 SQLite fts5 扩展](https://github.com/wangfenjin/simple)
 
 ## TODO
 
