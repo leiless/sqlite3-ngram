@@ -40,6 +40,7 @@ add_library(
         src/ngram.cpp
         src/utils.cpp
         src/token_vector.cpp
+        src/highlight.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} glog::glog)

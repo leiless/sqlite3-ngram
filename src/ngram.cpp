@@ -16,6 +16,7 @@ SQLITE_EXTENSION_INIT1
 
 #include "utils.h"
 #include "token_vector.h"
+#include "highlight.h"
 
 /**
  * [qt.]
@@ -352,5 +353,9 @@ int sqlite3_ngram_init(
     }
     CHECK_EQ(pFts5Api->iVersion, 2);
 
-    return pFts5Api->xCreateTokenizer(pFts5Api, LIBNAME, (void *) pFts5Api, &token_handle, nullptr);
+    int rc = pFts5Api->xCreateTokenizer(pFts5Api, LIBNAME, (void *) pFts5Api, &token_handle, nullptr);
+    if (rc == SQLITE_OK) {
+        rc = pFts5Api->xCreateFunction(pFts5Api, LIBNAME "_highlight", pFts5Api, ngram_highlight, nullptr);
+    }
+    return rc;
 }
