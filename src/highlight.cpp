@@ -1,4 +1,5 @@
 #include <cstring>
+#include <glog/logging.h>
 
 #include "highlight.h"
 #include "utils.h"
@@ -80,7 +81,19 @@ static inline int fts5CInstIterInit(
     return rc;
 }
 
-// TODO: TBD
+typedef struct HighlightContext HighlightContext;
+struct HighlightContext {
+    CInstIter iter;     /* Coalesced Instance Iterator */
+    int iPos;           /* Current token offset in zIn[] */
+    int iRangeStart;    /* First token to include */
+    int iRangeEnd;      /* If non-zero, last token to include */
+    const char *zOpen;  /* Opening highlight */
+    const char *zClose; /* Closing highlight */
+    const char *zIn;    /* Input text */
+    int nIn;            /* Size of input text in bytes */
+    int iOff;           /* Current offset within zIn[] */
+    char *zOut;         /* Output value */
+};
 
 void ngram_highlight(
         const Fts5ExtensionApi *pApi,   /* API offered by current FTS version */
@@ -89,5 +102,24 @@ void ngram_highlight(
         int nVal,                       /* Number of values in apVal[] array */
         sqlite3_value **apVal           /* Array of trailing arguments */
 ) {
-    UNUSED(pApi, pFts, pCtx, nVal, apVal);
+    if (nVal != 3) {
+        const char *zErr = "wrong number of arguments to function " LIBNAME "_highlight()";
+        sqlite3_result_error(pCtx, zErr, -1);
+        return;
+    }
+
+    HighlightContext ctx;
+    memset(&ctx, 0, sizeof(ctx));
+
+    int iCol = sqlite3_value_int(apVal[0]);
+    ctx.zOpen = (const char *) sqlite3_value_text(apVal[1]);
+    ctx.zClose = (const char *) sqlite3_value_text(apVal[2]);
+
+    DLOG(INFO) << "iCol: " << iCol << " zOpen: " << ctx.zOpen << " zClose: " << ctx.zClose;
+
+    // TODO: do we need to release zIn upon return?
+    int rc = pApi->xColumnText(pFts, iCol, &ctx.zIn, &ctx.nIn);
+    if (rc == SQLITE_OK && ctx.zIn != nullptr) {
+
+    }
 }
