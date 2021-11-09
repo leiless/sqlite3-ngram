@@ -1,6 +1,7 @@
 #include "highlight.h"
-
 #include "utils.h"
+
+SQLITE_EXTENSION_INIT3
 
 void ngram_highlight(
         const Fts5ExtensionApi *pApi,   /* API offered by current FTS version */
