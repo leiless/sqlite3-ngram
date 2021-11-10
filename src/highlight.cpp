@@ -109,6 +109,32 @@ struct HighlightContext {
 };
 
 /*
+** Append text to the HighlightContext output string - ctx->zOut. Argument
+** z points to a buffer containing n bytes of text to append. If n is
+** negative, everything up until the first '\0' is appended to the output.
+**
+** If *pRc is set to any value other than SQLITE_OK when this function is
+** called, it is a no-op. If an error (i.e. an OOM condition) is encountered,
+** *pRc is set to an error code before returning.
+*/
+static void fts5HighlightAppend(
+        int *pRc,
+        HighlightContext *ctx,
+        const char *z, int n
+) {
+    if (n < 0) {
+        CHECK_EQ(n, -1);
+    }
+
+    if (*pRc == SQLITE_OK && z != nullptr) {
+        if (n < 0) n = (int) strlen(z);
+        CHECK_GE(n, 0);
+        ctx->zOut = sqlite3_mprintf("%z%.*s", ctx->zOut, n, z);
+        if (ctx->zOut == nullptr) *pRc = SQLITE_NOMEM;
+    }
+}
+
+/*
 ** Tokenizer callback used by implementation of highlight() function.
 */
 static inline int fts5HighlightCb(
@@ -126,18 +152,29 @@ static inline int fts5HighlightCb(
     // Current token offset(index)
     int iPhrase = ctx->iPhrase++;
 
+    int rc = SQLITE_OK;
+
     if (iPhrase == ctx->iter.iStart) {
         DLOG(INFO) << "iStart: " << iStartOff << " " << iEndOff;
-    }
 
-    int rc = SQLITE_OK;
+        fts5HighlightAppend(&rc, ctx, &ctx->zIn[ctx->iOff], iStartOff - ctx->iOff);
+        fts5HighlightAppend(&rc, ctx, ctx->zOpen, -1);
+        ctx->iOff = iStartOff;
+    }
 
     if (iPhrase == ctx->iter.iEnd) {
         if (iPhrase != ctx->iter.iStart) {
             DLOG(INFO) << "iEnd: " << iStartOff << " " << iEndOff;
         }
 
-        rc = fts5CInstIterNext(&ctx->iter);
+        fts5HighlightAppend(&rc, ctx, &ctx->zIn[ctx->iOff], iEndOff - ctx->iOff);
+        fts5HighlightAppend(&rc, ctx, ctx->zClose, -1);
+        ctx->iOff = iEndOff;
+
+        // Move iterator to next token instance
+        if (rc == SQLITE_OK) {
+            rc = fts5CInstIterNext(&ctx->iter);
+        }
     }
 
     return rc;
@@ -165,7 +202,6 @@ void ngram_highlight(
 
     DLOG(INFO) << "iCol: " << iCol << " zOpen: " << ctx.zOpen << " zClose: " << ctx.zClose;
 
-    // TODO: do we need to release zIn upon return?
     int rc = pApi->xColumnText(pFts, iCol, &ctx.zIn, &ctx.nIn);
     if (rc == SQLITE_OK && ctx.zIn != nullptr) {
         // Init the iterator and get the first coalesced phrase
@@ -173,6 +209,17 @@ void ngram_highlight(
 
         if (rc == SQLITE_OK) {
             rc = pApi->xTokenize(pFts, ctx.zIn, ctx.nIn, (void *) &ctx, fts5HighlightCb);
+            if (rc == SQLITE_OK) {
+                fts5HighlightAppend(&rc, &ctx, &ctx.zIn[ctx.iOff], ctx.nIn - ctx.iOff);
+            }
+            if (rc == SQLITE_OK) {
+                sqlite3_result_text(pCtx, ctx.zOut, -1, SQLITE_TRANSIENT);
+            }
+            sqlite3_free(ctx.zOut);
         }
+    }
+
+    if (rc != SQLITE_OK) {
+        sqlite3_result_error_code(pCtx, rc);
     }
 }
