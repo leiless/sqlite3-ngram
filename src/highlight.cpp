@@ -35,11 +35,16 @@ static inline int fts5CInstIterNext(CInstIter *pIter) {
     while (rc == SQLITE_OK && pIter->iInst < pIter->nInst) {
         int ip;
         int ic;
-        int io;
+        int io; // Token offset
         rc = pIter->pApi->xInst(pIter->pFts, pIter->iInst, &ip, &ic, &io);
         if (rc == SQLITE_OK) {
             if (ic == pIter->iCol) {
-                int iEnd = io - 1 + pIter->pApi->xPhraseSize(pIter->pFts, ip);
+                // iEnd is inclusive
+                int iEnd = io + pIter->pApi->xPhraseSize(pIter->pFts, ip) - 1;
+
+                DLOG(INFO) << "iPhrase: " << ip << " iCol: " << ic << " iOff: " << io << " iEnd: " << iEnd
+                           << " iter.iStart: " << pIter->iStart << " iter.iEnd: " << pIter->iEnd;
+
                 if (pIter->iStart < 0) {
                     pIter->iStart = io;
                     pIter->iEnd = iEnd;
@@ -120,6 +125,6 @@ void ngram_highlight(
     // TODO: do we need to release zIn upon return?
     int rc = pApi->xColumnText(pFts, iCol, &ctx.zIn, &ctx.nIn);
     if (rc == SQLITE_OK && ctx.zIn != nullptr) {
-
+        rc = fts5CInstIterInit(pApi, pFts, iCol, &ctx.iter);
     }
 }
