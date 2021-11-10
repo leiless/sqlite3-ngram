@@ -122,22 +122,22 @@ static inline int fts5HighlightCb(
     if (tflags & FTS5_TOKEN_COLOCATED) return SQLITE_OK;
 
     UNUSED(pToken, nToken);
-    auto p = (HighlightContext *) pContext;
+    auto ctx = (HighlightContext *) pContext;
     // Current token offset(index)
-    int iPhrase = p->iPhrase++;
+    int iPhrase = ctx->iPhrase++;
 
-    if (iPhrase == p->iter.iStart) {
+    if (iPhrase == ctx->iter.iStart) {
         DLOG(INFO) << "iStart: " << iStartOff << " " << iEndOff;
     }
 
     int rc = SQLITE_OK;
 
-    if (iPhrase == p->iter.iEnd) {
-        if (iPhrase != p->iter.iStart) {
+    if (iPhrase == ctx->iter.iEnd) {
+        if (iPhrase != ctx->iter.iStart) {
             DLOG(INFO) << "iEnd: " << iStartOff << " " << iEndOff;
         }
 
-        rc = fts5CInstIterNext(&p->iter);
+        rc = fts5CInstIterNext(&ctx->iter);
     }
 
     return rc;
