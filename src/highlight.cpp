@@ -49,7 +49,7 @@ static inline int fts5CInstIterNext(CInstIter *pIter) {
                 if (pIter->iStart < 0) {
                     pIter->iStart = io;
                     pIter->iEnd = iEnd;
-                } else if (io <= pIter->iEnd) {
+                } else if (io <= pIter->iEnd + 1) { // Coalesce adjoint phrases
                     if (iEnd > pIter->iEnd) pIter->iEnd = iEnd;
                 } else {
                     break;
@@ -210,6 +210,7 @@ void ngram_highlight(
         if (rc == SQLITE_OK) {
             rc = pApi->xTokenize(pFts, ctx.zIn, ctx.nIn, (void *) &ctx, fts5HighlightCb);
             if (rc == SQLITE_OK) {
+                // Append the rest of the zIn into zOut
                 fts5HighlightAppend(&rc, &ctx, &ctx.zIn[ctx.iOff], ctx.nIn - ctx.iOff);
             }
             if (rc == SQLITE_OK) {
