@@ -77,14 +77,12 @@ static inline int fts5CInstIterInit(
         int iCol,
         CInstIter *pIter
 ) {
-    int rc;
-
-    memset(pIter, 0, sizeof(CInstIter));
+    memset(pIter, 0, sizeof(*pIter));
     pIter->pApi = pApi;
     pIter->pFts = pFts;
     pIter->iCol = iCol;
-    rc = pApi->xInstCount(pFts, &pIter->nInst);
 
+    int rc = pApi->xInstCount(pFts, &pIter->nInst);
     if (rc == SQLITE_OK) {
         rc = fts5CInstIterNext(pIter);
     }
@@ -96,10 +94,6 @@ typedef struct HighlightContext HighlightContext;
 struct HighlightContext {
     CInstIter iter;     /* Coalesced Instance Iterator */
     int iPhrase;        /* Current token offset in zIn[] */
-#if 0
-    int iRangeStart;    /* First token to include */
-    int iRangeEnd;      /* If non-zero, last token to include */
-#endif
     const char *zOpen;  /* Opening highlight */
     const char *zClose; /* Closing highlight */
     const char *zIn;    /* Input text */
@@ -148,6 +142,7 @@ static inline int fts5HighlightCb(
     if (tflags & FTS5_TOKEN_COLOCATED) return SQLITE_OK;
 
     UNUSED(pToken, nToken);
+
     auto ctx = (HighlightContext *) pContext;
     // Current token offset(index)
     int iPhrase = ctx->iPhrase++;
