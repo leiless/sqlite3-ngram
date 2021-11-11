@@ -8,7 +8,7 @@ cd "$(dirname "$0")"
 TAG=local/build-sqlite3-ngram
 docker build --rm -t $TAG .
 
-ROOT=$(dirname "$(dirname "$PWD")")
+ROOT=$(dirname "$PWD")
 docker run -it --rm \
     --security-opt label=disable --userns keep-id \
     -v "$ROOT":/src \
