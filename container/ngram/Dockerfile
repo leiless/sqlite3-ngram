@@ -3,6 +3,7 @@ FROM ubuntu
 ARG DEBIAN_FRONTEND=noninteractive
 
 # https://stackoverflow.com/questions/24648357/compiling-a-static-executable-with-cmake
+# https://stackoverflow.com/questions/25518701/protobuf-cannot-find-shared-libraries
 RUN set -eux && \
     apt-get update && \
     TMP_PKG='build-essential' && \
@@ -21,6 +22,7 @@ RUN set -eux && \
     cd .. && rm -rf protobuf-2.6.1 && \
     apt-get autoremove -y $TMP_PKG && \
     rm -rf /var/lib/apt/lists/* && \
+    ldconfig && \
     protoc --version && \
     g++ --version
 
