@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package ngram_tokenier;
+
+message HighlightResult {
+  message Range {
+    optional int32 iStart = 1;
+    optional int32 iEnd = 2; // Inclusive
+  }
+  message Match {
+    optional int32 iColumn = 1;
+    optional bytes Text = 2;
+    repeated Range Ranges = 3;
+  }
+  repeated Match Matches = 1;
+}
