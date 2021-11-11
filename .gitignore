@@ -20,3 +20,6 @@ deps/
 *.dylib
 *.dll
 
+*.pb.cc
+*.pb.h
+

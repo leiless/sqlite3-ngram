@@ -34,6 +34,7 @@ add_compile_definitions(BUILD_USER="${BUILD_USER}")
 
 # see: https://github.com/google/glog#incorporating-glog-into-a-cmake-project
 find_package(glog 0.6.0 REQUIRED)
+find_package(Protobuf 2.6.1 REQUIRED)
 
 add_library(
         ${PROJECT_NAME} SHARED
@@ -41,6 +42,7 @@ add_library(
         src/utils.cpp
         src/token_vector.cpp
         src/highlight.cpp
+        src/proto/highlight_result.pb.cc
 )
 
 target_link_libraries(${PROJECT_NAME} glog::glog)
