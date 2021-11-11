@@ -18,7 +18,7 @@ RUN set -eux && \
     curl -L "$URL" -o "$(basename "$URL")" && \
     tar xf protobuf-2.6.1.tar.gz --no-same-owner && \
     cd protobuf-2.6.1 && \
-    ./configure && make -j$(nproc) && make install && \
+    ./configure && make -j$(nproc) -fPIC && make install && \
     cd .. && rm -rf protobuf-2.6.1 && \
     apt-get autoremove -y $TMP_PKG && \
     rm -rf /var/lib/apt/lists/* && \
