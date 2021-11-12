@@ -6,7 +6,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # https://stackoverflow.com/questions/25518701/protobuf-cannot-find-shared-libraries
 RUN set -eux && \
     apt-get update && \
-    TMP_PKG='build-essential' && \
+    TMP_PKG="build-essential" && \
     apt-get install -y --no-install-recommends ca-certificates git curl unzip cmake g++ make $TMP_PKG && \
     git clone --depth=1 https://github.com/google/glog.git && \
     cd glog && \
@@ -18,7 +18,7 @@ RUN set -eux && \
     curl -L "$URL" -o "$(basename "$URL")" && \
     tar xf protobuf-2.6.1.tar.gz --no-same-owner && \
     cd protobuf-2.6.1 && \
-    ./configure && make -j$(nproc) && make install && \
+    CXXFLAGS="-g -DNDEBUG -fPIC" ./configure && make -j$(nproc) && make install && \
     cd .. && rm -rf protobuf-2.6.1 && \
     apt-get autoremove -y $TMP_PKG && \
     rm -rf /var/lib/apt/lists/* && \
