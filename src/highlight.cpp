@@ -175,19 +175,21 @@ static inline int fts5HighlightCb(
     return rc;
 }
 
-void ngram_highlight(
+static inline void highlight1(
         const Fts5ExtensionApi *pApi,   /* API offered by current FTS version */
         Fts5Context *pFts,              /* First arg to pass to pApi functions */
         sqlite3_context *pCtx,          /* Context for returning result/error */
-        int nVal,                       /* Number of values in apVal[] array */
         sqlite3_value **apVal           /* Array of trailing arguments */
 ) {
-    if (nVal != 3) {
-        const char *zErr = "wrong number of arguments to function " LIBNAME "_highlight()";
-        sqlite3_result_error(pCtx, zErr, -1);
-        return;
-    }
+    // TODO
+}
 
+static inline void highlight3(
+        const Fts5ExtensionApi *pApi,   /* API offered by current FTS version */
+        Fts5Context *pFts,              /* First arg to pass to pApi functions */
+        sqlite3_context *pCtx,          /* Context for returning result/error */
+        sqlite3_value **apVal           /* Array of trailing arguments */
+) {
     HighlightContext ctx;
     memset(&ctx, 0, sizeof(ctx));
 
@@ -217,5 +219,22 @@ void ngram_highlight(
 
     if (rc != SQLITE_OK) {
         sqlite3_result_error_code(pCtx, rc);
+    }
+}
+
+void ngram_highlight(
+        const Fts5ExtensionApi *pApi,   /* API offered by current FTS version */
+        Fts5Context *pFts,              /* First arg to pass to pApi functions */
+        sqlite3_context *pCtx,          /* Context for returning result/error */
+        int nVal,                       /* Number of values in apVal[] array */
+        sqlite3_value **apVal           /* Array of trailing arguments */
+) {
+    if (nVal == 1) {
+        highlight1(pApi, pFts, pCtx, apVal);
+    } else if (nVal == 3) {
+        highlight3(pApi, pFts, pCtx, apVal);
+    } else {
+        const char *zErr = "wrong number of arguments to function " LIBNAME "_highlight()";
+        sqlite3_result_error(pCtx, zErr, -1);
     }
 }
