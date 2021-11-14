@@ -2,7 +2,7 @@ syntax = "proto2";
 
 option optimize_for = LITE_RUNTIME;
 
-package ngram_tokenier;
+package ngram_tokenizer;
 
 message HighlightResult {
   message Range {

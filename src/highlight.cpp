@@ -3,6 +3,7 @@
 
 #include "highlight.h"
 #include "utils.h"
+#include "proto/highlight_result.pb.h"
 
 SQLITE_EXTENSION_INIT3
 
