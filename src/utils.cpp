@@ -1,6 +1,7 @@
 #include <cerrno>
 #include <cstdlib>
 #include <cstdint>
+#include <sstream>
 
 #include "utils.h"
 
@@ -159,5 +160,33 @@ namespace ngram_tokenizer {
         return 0;
         invalid:
         return EINVAL;
+    }
+
+    // https://stackoverflow.com/questions/9435385/split-a-string-using-c11
+    std::vector<std::string> split(const std::string &s, char delim) {
+        std::stringstream ss(s);
+        std::string item;
+        std::vector<std::string> elems;
+        while (std::getline(ss, item, delim)) {
+            elems.emplace_back(item);
+        }
+        return elems;
+    }
+
+    static const char *WHITESPACE = " \n\r\t\f\v";
+
+    static inline std::string ltrim(const std::string &s) {
+        size_t start = s.find_first_not_of(WHITESPACE);
+        return start == std::string::npos ? "" : s.substr(start);
+    }
+
+    static inline std::string rtrim(const std::string &s) {
+        size_t end = s.find_last_not_of(WHITESPACE);
+        return end == std::string::npos ? "" : s.substr(0, end + 1);
+    }
+
+    // https://www.techiedelight.com/trim-string-cpp-remove-leading-trailing-spaces/
+    std::string trim(const std::string &s) {
+        return rtrim(ltrim(s));
     }
 }

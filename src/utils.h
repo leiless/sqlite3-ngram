@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
 #include <sys/types.h>
 #include <cstddef>
 
@@ -16,4 +18,8 @@ namespace ngram_tokenizer {
     int parse_int(const char *, char, int, int *);
 
     int utf8_validatestr(const u_int8_t *, size_t);
+
+    std::vector<std::string> split(const std::string &, char);
+
+    std::string trim(const std::string &);
 }
