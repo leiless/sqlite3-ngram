@@ -12,7 +12,7 @@ RUN set -eux && \
     cd glog && \
     cmake -S . -B build -DBUILD_SHARED_LIBS=OFF && \
     cmake --build build --target install && \
-    mv build/lib/cmake/glog/glog-modules.cmake /usr/local/lib/cmake/glog && \
+    ( mv build/lib/cmake/glog/glog-modules.cmake /usr/local/lib/cmake/glog || true ) && \
     cd .. && rm -rf glog && \
     URL=https://github.com/protocolbuffers/protobuf/releases/download/v2.6.1/protobuf-2.6.1.tar.gz && \
     curl -L "$URL" -o "$(basename "$URL")" && \
