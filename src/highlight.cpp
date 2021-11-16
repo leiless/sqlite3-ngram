@@ -200,6 +200,8 @@ static inline std::vector<int> parseColumns(
             }
         }
     }
+
+    return columns;
 }
 
 static inline void highlight1(
@@ -208,9 +210,9 @@ static inline void highlight1(
         sqlite3_context *pCtx,          /* Context for returning result/error */
         sqlite3_value **apVal           /* Array of trailing arguments */
 ) {
-    // TODO
     auto columnsArg = (const char *) sqlite3_value_text(apVal[0]);
     auto columns = parseColumns(pApi, pFts, columnsArg);
+    // TODO
 }
 
 static inline void highlight3(
