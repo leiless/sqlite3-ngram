@@ -211,6 +211,7 @@ static inline void highlight1(
         sqlite3_value **apVal           /* Array of trailing arguments */
 ) {
     auto columnsArg = (const char *) sqlite3_value_text(apVal[0]);
+    DLOG(INFO) << "columns: " << columnsArg;
     auto columns = parseColumns(pApi, pFts, columnsArg);
     // TODO
 }
