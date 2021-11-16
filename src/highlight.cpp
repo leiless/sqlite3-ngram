@@ -176,7 +176,13 @@ static inline int fts5HighlightCb(
     return rc;
 }
 
-static inline std::vector<int> parseColumns(const char *columnsArg) {
+static inline std::vector<int> parseColumns(
+        const Fts5ExtensionApi *pApi,
+        Fts5Context *pFts,
+        const char *columnsArg) {
+    int columnCount = pApi->xColumnCount(pFts);
+    CHECK_GE(columnCount, 0);
+
     auto elems = ngram_tokenizer::split(columnsArg, ',');
     std::vector<int> columns;
     for (auto &s: elems) {
@@ -187,12 +193,13 @@ static inline std::vector<int> parseColumns(const char *columnsArg) {
                 LOG(FATAL) << s << " is not a numeric value";
             } else if (column < 0) {
                 LOG(FATAL) << "expected a non-negative column number, got " << column;
+            } else if (column >= columnCount) {
+                LOG(FATAL) << "column " << column << " is out of range [0, " << columnCount << ")";
             } else {
                 columns.emplace_back(column);
             }
         }
     }
-    return columns;
 }
 
 static inline void highlight1(
@@ -203,7 +210,7 @@ static inline void highlight1(
 ) {
     // TODO
     auto columnsArg = (const char *) sqlite3_value_text(apVal[0]);
-    auto columns = parseColumns(columnsArg);
+    auto columns = parseColumns(pApi, pFts, columnsArg);
 }
 
 static inline void highlight3(
